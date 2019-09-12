@@ -56,8 +56,7 @@ defmodule MetaLogger.MixProject do
         "Felipe Vieira",
         "Fernando Hamasaki de Amorim"
       ],
-      name: "meta_logger",
-      organization: "findhotel"
+      name: "meta_logger"
     }
   end
 end
