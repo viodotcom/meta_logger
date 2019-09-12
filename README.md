@@ -19,5 +19,14 @@ Documentation is generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). The docs can be found at
 [https://hexdocs.pm/meta_logger](https://hexdocs.pm/meta_logger).
 
+## Release
+
+After merge a new feature/bug you can bump and publish it with:
+
+```sh
+make release
+make publish
+```
+
 ## License
 `meta_logger` source code is released under Apache 2 License. Check the [LICENSE](./LICENSE) file for more information.
