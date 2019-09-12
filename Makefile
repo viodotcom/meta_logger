@@ -16,7 +16,6 @@ credo: ## Check style guide
 dialyzer: ## Check types
 	@mix dialyzer --halt-exit-status
 
-
 .PHONY: format
 format: ## Check code format
 	@mix format --check-formatted
@@ -97,4 +96,3 @@ release: ## Bumps the version and creates the new tag
 .PHONY: test
 test: ## Run tests
 	mix test --cover
-

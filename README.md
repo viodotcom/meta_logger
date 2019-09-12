@@ -4,7 +4,7 @@ Wrapper for Elixir.Logger that keeps logger metadata from caller processes.
 
 ## Installation
 
-The package is [available in Hex](https://hex.pm/docs/publish), and can be installed
+The package is [available in Hex](https://hex.pm/packages/meta_logger), and can be installed
 by adding `meta_logger` to your list of dependencies in `mix.exs`:
 
 ```elixir
