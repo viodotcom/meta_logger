@@ -1,0 +1,34 @@
+language: elixir
+
+elixir:
+  - 1.9
+
+otp_release:
+  - 22.0
+
+cache:
+  directories:
+    - _build
+    - deps
+    - priv/plts
+
+install:
+  - make install
+
+stages:
+  - test
+  - quality
+
+jobs:
+  include:
+    - stage: test
+      name: Test
+      script: make test
+    - stage: quality
+      name: Format
+      script: make format
+    - name: Credo
+      script: make credo
+    - name: Dialyzer
+      script: make dialyzer
+

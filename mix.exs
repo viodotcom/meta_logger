@@ -6,18 +6,15 @@ defmodule MetaLogger.MixProject do
   def project do
     [
       app: :meta_logger,
-      version: @version,
-      elixir: "~> 1.9",
-      start_permanent: Mix.env() == :prod,
       deps: deps(),
-      package: package(),
       description: "Keep logger metadata from caller processes",
-      docs: [
-        main: "MetaLogger",
-        source_ref: @version,
-        source_url: "https://github.com/FindHotel/meta_logger",
-        extras: ["README.md", "CHANGELOG.md"]
-      ]
+      dialyzer: dialyzer(),
+      docs: docs(),
+      elixir: "~> 1.9",
+      package: package(),
+      source_url: "https://github.com/FindHotel/meta_logger",
+      start_permanent: Mix.env() == :prod,
+      version: @version
     ]
   end
 
@@ -35,18 +32,32 @@ defmodule MetaLogger.MixProject do
     ]
   end
 
+  defp dialyzer do
+    [
+      plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+    ]
+  end
+
+  defp docs do
+    [
+      extras: ["README.md", "CHANGELOG.md"],
+      main: "readme",
+      source_ref: @version
+    ]
+  end
+
   defp package do
     %{
-      name: "meta_logger",
+      files: ["lib", "mix.exs", "README.md", "CHANGELOG.md"],
       licenses: ["Apache 2"],
-      organization: "findhotel",
+      links: %{"GitHub" => "https://github.com/FindHotel/meta_logger"},
       maintainers: [
         "Antonio Lorusso",
         "Felipe Vieira",
         "Fernando Hamasaki de Amorim"
       ],
-      links: %{"GitHub" => "https://github.com/FindHotel/meta_logger"},
-      files: ["lib", "mix.exs", "README.md", "CHANGELOG.md"]
+      name: "meta_logger",
+      organization: "findhotel"
     }
   end
 end
