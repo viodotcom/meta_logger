@@ -15,7 +15,8 @@ defmodule MetaLogger.MixProject do
       docs: [
         main: "MetaLogger",
         source_ref: @version,
-        source_url: "https://github.com/FindHotel/meta_logger"
+        source_url: "https://github.com/FindHotel/meta_logger",
+        extras: ["README.md", "CHANGELOG.md"]
       ]
     ]
   end
@@ -27,12 +28,18 @@ defmodule MetaLogger.MixProject do
   end
 
   defp deps do
-    []
+    [
+      {:credo, "~> 1.1", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
+    ]
   end
 
   defp package do
     %{
+      name: "meta_logger",
       licenses: ["Apache 2"],
+      organization: "findhotel",
       maintainers: [
         "Antonio Lorusso",
         "Felipe Vieira",
