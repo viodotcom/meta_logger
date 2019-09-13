@@ -1,5 +1,7 @@
 # MetaLogger
 
+[![Build Status](https://travis-ci.com/FindHotel/meta_logger.svg?branch=master)](https://travis-ci.com/FindHotel/meta_logger)
+
 Wrapper for Elixir.Logger that keeps logger metadata from caller processes.
 
 ## Installation
