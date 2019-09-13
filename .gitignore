@@ -22,3 +22,6 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 meta_logger-*.tar
 
+# Ignore dialyzer PLTs
+/priv/plts/*.plt
+/priv/plts/*.plt.hash
