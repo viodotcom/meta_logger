@@ -48,8 +48,7 @@ defmodule MetaLogger do
 
   @spec merge_logger_metadata_from_parent_processes() :: :ok
   defp merge_logger_metadata_from_parent_processes do
-    "$callers"
-    |> String.to_atom()
+    :"$callers"
     |> Process.get()
     |> List.wrap()
     |> Enum.each(&get_process_logger_metadata/1)
@@ -57,7 +56,10 @@ defmodule MetaLogger do
 
   @spec get_process_logger_metadata(pid()) :: :ok
   defp get_process_logger_metadata(process) do
-    case get_in(Process.info(process), @metadata) do
+    process
+    |> Process.info()
+    |> get_in(@metadata)
+    |> case do
       {true, metadata} ->
         Logger.metadata(metadata)
 

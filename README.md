@@ -19,6 +19,14 @@ Documentation is generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). The docs can be found at
 [https://hexdocs.pm/meta_logger](https://hexdocs.pm/meta_logger).
 
+## Usage
+
+Just replace `Logger` with `MetaLogger`, there's no need to require it before using:
+
+```elixir
+MetaLogger.[debug|error|info|log|warn](...)
+```
+
 ## Release
 
 After merge a new feature/bug you can bump and publish it with:

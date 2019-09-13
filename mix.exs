@@ -2,6 +2,7 @@ defmodule MetaLogger.MixProject do
   use Mix.Project
 
   @version "0.0.0"
+  @source_url "https://github.com/FindHotel/meta_logger"
 
   def project do
     [
@@ -12,7 +13,7 @@ defmodule MetaLogger.MixProject do
       docs: docs(),
       elixir: "~> 1.9",
       package: package(),
-      source_url: "https://github.com/FindHotel/meta_logger",
+      source_url: @source_url,
       start_permanent: Mix.env() == :prod,
       version: @version
     ]
@@ -50,7 +51,7 @@ defmodule MetaLogger.MixProject do
     %{
       files: ["lib", "mix.exs", "README.md", "CHANGELOG.md"],
       licenses: ["Apache 2"],
-      links: %{"GitHub" => "https://github.com/FindHotel/meta_logger"},
+      links: %{"GitHub" => @source_url},
       maintainers: [
         "Antonio Lorusso",
         "Felipe Vieira",
