@@ -18,20 +18,46 @@ defmodule MetaLoggerTest do
 
         logs =
           capture_log(fn ->
-            Task.async(fn ->
-              Logger.metadata(bar: "bar")
-
+            Task.await(
               Task.async(fn ->
-                Logger.metadata(baz: "baz")
+                Logger.metadata(bar: "bar")
 
-                Subject.unquote(level)("test")
+                Task.await(
+                  Task.async(fn ->
+                    Logger.metadata(baz: "baz")
+
+                    Subject.unquote(level)("test")
+                  end)
+                )
               end)
-              |> Task.await()
-            end)
-            |> Task.await()
+            )
           end)
 
         assert logs =~ "foo=foo bar=bar baz=baz [#{unquote(level)}]"
+        assert logs =~ "test"
+      end
+
+      test "logs a message with #{level} and no metadata when logger metadata key is set to nil" do
+        Process.put("$logger_metadata$", nil)
+
+        logs =
+          capture_log(fn ->
+            Task.await(
+              Task.async(fn ->
+                Process.put("$logger_metadata$", nil)
+
+                Task.await(
+                  Task.async(fn ->
+                    Process.put("$logger_metadata$", nil)
+
+                    Subject.unquote(level)("test")
+                  end)
+                )
+              end)
+            )
+          end)
+
+        assert logs =~ "[#{unquote(level)}]"
         assert logs =~ "test"
       end
     end
@@ -61,6 +87,30 @@ defmodule MetaLoggerTest do
           end)
 
         assert logs =~ "foo=baz bar=foo baz=bar [#{unquote(level)}]"
+        assert logs =~ "test"
+      end
+
+      test "logs a message with #{level} and no metadata when logger metadata key is set to nil" do
+        Process.put("$logger_metadata$", nil)
+
+        logs =
+          capture_log(fn ->
+            Task.await(
+              Task.async(fn ->
+                Process.put("$logger_metadata$", nil)
+
+                Task.await(
+                  Task.async(fn ->
+                    Process.put("$logger_metadata$", nil)
+
+                    Subject.log(unquote(level), "test")
+                  end)
+                )
+              end)
+            )
+          end)
+
+        assert logs =~ "[#{unquote(level)}]"
         assert logs =~ "test"
       end
     end)
