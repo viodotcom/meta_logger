@@ -6,6 +6,8 @@ Wrapper for Elixir.Logger that keeps logger metadata from caller processes.
 
 ## Installation
 
+MetaLogger requires Elixir 1.10 or greater. For previous versions use MetaLogger `0.1.0`.
+
 The package is [available in Hex](https://hex.pm/packages/meta_logger), and can be installed
 by adding `meta_logger` to your list of dependencies in `mix.exs`:
 

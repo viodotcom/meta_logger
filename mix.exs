@@ -11,7 +11,7 @@ defmodule MetaLogger.MixProject do
       description: "Keep logger metadata from caller processes",
       dialyzer: dialyzer(),
       docs: docs(),
-      elixir: "~> 1.9",
+      elixir: "~> 1.10",
       package: package(),
       source_url: @source_url,
       start_permanent: Mix.env() == :prod,

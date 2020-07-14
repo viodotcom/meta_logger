@@ -7,7 +7,7 @@ defmodule MetaLogger do
 
   @type chardata_or_fun :: IO.chardata() | String.Chars.t() | (any() -> any())
   @type metadata :: keyword()
-  @metadata ~w(dictionary logger_metadata)a
+  @metadata ~w(dictionary $logger_metadata$)a
 
   Enum.each(~w(debug error info warn)a, fn level ->
     @doc """
@@ -60,11 +60,8 @@ defmodule MetaLogger do
     |> Process.info()
     |> get_in(@metadata)
     |> case do
-      {true, metadata} ->
-        Logger.metadata(metadata)
-
-      _ ->
-        :ok
+      nil -> :ok
+      metadata -> Logger.metadata(metadata)
     end
   end
 end
