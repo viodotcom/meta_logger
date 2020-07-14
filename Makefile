@@ -57,7 +57,7 @@ REPO := https:\/\/github.com\/FindHotel\/${REPO_NAME}\/compare
 
 .PHONY: release
 release: ## Bumps the version and creates the new tag
-	@printf e "${BLUE_COLOR}The current version is:${DEFAULT_COLOR} ${VERSION}" && \
+	@printf e "${BLUE_COLOR}The current version is:${DEFAULT_COLOR} ${VERSION}\n" && \
 	  read -r -p "Do you want to release a [major|minor|patch]: " TYPE && \
 	  case "$$TYPE" in \
 	  "major") \
@@ -94,7 +94,7 @@ release: ## Bumps the version and creates the new tag
 	  git commit -m "Bump to $$NEW_VERSION" > /dev/null && \
 	  printf "\t${DIM_COLOR}Creating release tag${DEFAULT_COLOR}\n" && \
 	  git tag -a -m "" $$NEW_VERSION && \
-	  printf "\n${BLUE_COLOR}If everything's ok, push the changes to updstream!${DEFAULT_COLOR}\n"
+	  printf "\n${BLUE_COLOR}If everything's ok, push the changes to upstream!${DEFAULT_COLOR}\n"
 
 .PHONY: test
 test: ## Run tests
