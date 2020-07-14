@@ -55,7 +55,8 @@ defmodule MetaLogger.MixProject do
       maintainers: [
         "Antonio Lorusso",
         "Felipe Vieira",
-        "Fernando Hamasaki de Amorim"
+        "Fernando Hamasaki de Amorim",
+        "Sergio Rodrigues"
       ],
       name: "meta_logger"
     }
