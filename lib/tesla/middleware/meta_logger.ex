@@ -7,10 +7,14 @@ defmodule Tesla.Middleware.MetaLogger do
 
   ## Example usage
 
-      Plug #{inspect(__MODULE__)},
+    defmodule MyClient do
+      use Tesla
+
+      plug #{inspect(__MODULE__)},
         filter_headers: ["authorization"],
         log_level: :debug,
-        log_tag: BoFH.Payments.Payvision.Client.HTTP
+        log_tag: MyApp
+    end
 
   ## Options
 

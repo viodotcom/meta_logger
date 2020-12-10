@@ -31,6 +31,31 @@ Just replace `Logger` with `MetaLogger`, there's no need to require it before us
 MetaLogger.[debug|error|info|log|warn](...)
 ```
 
+## Tesla Middleware
+
+Logs requests and responses.
+
+### Example usage
+
+```elixir
+defmodule MyClient do
+  use Tesla
+
+  plug #{inspect(__MODULE__)},
+    filter_headers: ["authorization"],
+    log_level: :debug,
+    log_tag: MyApp
+end
+```
+
+### Options
+
+* `:filter_headers` - The headers that should not be logged,
+  the values will be replaced with `[FILTERED]`, defaults to: `[]`.
+* `:log_level` - The log level to be used, defaults to: `:info`. Responses with
+  HTTP status 400 and above will be logged with `:error`, and redirect with `:warn`.
+* `:log_tag` - The log tag to be prefixed in the logs, default to: `#{inspect(__MODULE__)}`.
+
 ## Release
 
 After merge a new feature/bug you can bump and publish it with:
