@@ -35,6 +35,20 @@ MetaLogger.[debug|error|info|log|warn](...)
 
 Logs requests and responses.
 
+## Installation
+
+Optionally MetaLogger requires another two dependencies, if you want to use the Tesla
+middleware, add those dependencies to your `mix.exs`:
+
+```elixir
+def deps do
+  [
+    {:tesla, "~> 1.4"},
+    {:miss, "~> 0.1"},
+  ]
+end
+```
+
 ### Example usage
 
 ```elixir
