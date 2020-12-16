@@ -1,0 +1,47 @@
+name: meta_logger
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Elixir
+      uses: actions/setup-elixir@v1
+      with:
+        elixir-version: '1.10.4'
+        otp-version: '23.0.4'
+
+    - name: Restore dependencies cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          deps
+          priv/plts
+        key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+        restore-keys: ${{ runner.os }}-mix-
+
+    - name: Install dependencies
+      run: mix deps.get
+
+    - name: Run tests
+      env:
+          MIX_ENV: test
+      run: make test
+
+    - name: Check formatted
+      run: make format
+
+    - name: Run credo
+      run: make credo
+
+    - name: Run dialyzer
+      run: make dialyzer

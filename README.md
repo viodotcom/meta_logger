@@ -1,6 +1,6 @@
 # MetaLogger
 
-[![Build Status](https://travis-ci.com/FindHotel/meta_logger.svg?branch=master)](https://travis-ci.com/FindHotel/meta_logger)
+![meta_logger](https://github.com/FindHotel/meta_logger/workflows/meta_logger/badge.svg?branch=master)
 
 Wrapper for Elixir.Logger that keeps logger metadata from caller processes.
 
@@ -30,6 +30,45 @@ Just replace `Logger` with `MetaLogger`, there's no need to require it before us
 ```elixir
 MetaLogger.[debug|error|info|log|warn](...)
 ```
+
+## Tesla Middleware
+
+Logs requests and responses.
+
+## Installation
+
+Optionally MetaLogger requires another two dependencies, if you want to use the Tesla
+middleware, add those dependencies to your `mix.exs`:
+
+```elixir
+def deps do
+  [
+    {:tesla, "~> 1.4"},
+    {:miss, "~> 0.1"},
+  ]
+end
+```
+
+### Example usage
+
+```elixir
+defmodule MyClient do
+  use Tesla
+
+  plug #{inspect(__MODULE__)},
+    filter_headers: ["authorization"],
+    log_level: :debug,
+    log_tag: MyApp
+end
+```
+
+### Options
+
+* `:filter_headers` - The headers that should not be logged,
+  the values will be replaced with `[FILTERED]`, defaults to: `[]`.
+* `:log_level` - The log level to be used, defaults to: `:info`. Responses with
+  HTTP status 400 and above will be logged with `:error`, and redirect with `:warn`.
+* `:log_tag` - The log tag to be prefixed in the logs, default to: `#{inspect(__MODULE__)}`.
 
 ## Release
 

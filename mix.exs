@@ -29,12 +29,17 @@ defmodule MetaLogger.MixProject do
     [
       {:credo, "~> 1.1", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false},
+
+      # Middleware dependencies
+      {:miss, "~> 0.1", optional: true},
+      {:tesla, "~> 1.4", optional: true}
     ]
   end
 
   defp dialyzer do
     [
+      plt_add_apps: [:miss, :tesla],
       plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
     ]
   end
