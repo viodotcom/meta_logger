@@ -57,6 +57,7 @@ defmodule MyClient do
 
   plug #{inspect(__MODULE__)},
     filter_headers: ["authorization"],
+    filter_query_params: [:api_key],
     log_level: :debug,
     log_tag: MyApp
 end
@@ -66,6 +67,8 @@ end
 
 * `:filter_headers` - The headers that should not be logged,
   the values will be replaced with `[FILTERED]`, defaults to: `[]`.
+* `:filter_query_params` - The query params that should not be logged,
+    the values will be replaced with `[FILTERED]`, defaults to: `[]`.
 * `:log_level` - The log level to be used, defaults to: `:info`. Responses with
   HTTP status 400 and above will be logged with `:error`, and redirect with `:warn`.
 * `:log_tag` - The log tag to be prefixed in the logs, default to: `#{inspect(__MODULE__)}`.
