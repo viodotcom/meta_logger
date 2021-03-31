@@ -12,6 +12,7 @@ defmodule Tesla.Middleware.MetaLogger do
 
       plug #{inspect(__MODULE__)},
         filter_headers: ["authorization"],
+        filter_query_params: [:api_key],
         log_level: :debug,
         log_tag: MyApp
     end
@@ -20,6 +21,8 @@ defmodule Tesla.Middleware.MetaLogger do
 
     * `:filter_headers` - The headers that should not be logged,
     the values will be replaced with `[FILTERED]`, defaults to: `[]`.
+    * `:filter_query_params` - The query params that should not be logged,
+    the values will be replaced with `[FILTERED]`, defaults to: `[]`
     * `:log_level` - The log level to be used, defaults to: `:info`. Responses with
     HTTP status 400 and above will be logged with `:error`, and redirect with `:warn`.
     * `:log_tag` - The log tag to be prefixed in the logs, default to: `#{inspect(__MODULE__)}`.
@@ -51,6 +54,7 @@ defmodule Tesla.Middleware.MetaLogger do
     middleware_options
     |> Keyword.merge(env_options, fn _key, _middleware_value, env_value -> env_value end)
     |> maybe_put_default_value(:filter_headers, [])
+    |> maybe_put_default_value(:filter_query_params, [])
     |> maybe_put_default_value(:log_level, :info)
     |> maybe_put_default_value(:log_tag, __MODULE__)
   end
@@ -63,6 +67,7 @@ defmodule Tesla.Middleware.MetaLogger do
   defp log_request(%Env{body: body, method: method, query: query, url: url} = env, options) do
     level = Keyword.get(options, :log_level)
     headers = build_headers(env, options)
+    query = build_query(query, options)
 
     log([format_method(method), url, inspect(query), inspect(headers)], level, options)
     log(body, level, options)
@@ -95,6 +100,12 @@ defmodule Tesla.Middleware.MetaLogger do
     Enum.map(headers, &filter_header(&1, filter_headers))
   end
 
+  @spec build_headers(Env.query(), Env.opts()) :: Env.query()
+  defp build_query(query, options) do
+    filter_query_params = Keyword.get(options, :filter_query_params)
+    Enum.map(query, &filter_query_params(&1, filter_query_params))
+  end
+
   @spec response_log_level(Env.result(), Env.opts()) :: Logger.level()
   defp response_log_level({:error, _any}, _options), do: :error
   defp response_log_level({:ok, %Env{status: status}}, _options) when status >= 400, do: :error
@@ -104,6 +115,11 @@ defmodule Tesla.Middleware.MetaLogger do
   @spec filter_header({String.t(), String.t()}, [String.t()]) :: {String.t(), String.t()}
   defp filter_header({key, _value} = header, filter_headers),
     do: if(key in filter_headers, do: {key, "[FILTERED]"}, else: header)
+
+  @spec filter_query_params({String.t() | atom(), String.t()}, [atom() | String.t()]) ::
+          {atom() | String.t(), String.t()}
+  defp filter_query_params({key, _value} = param, filter_query_params),
+    do: if(key in filter_query_params, do: {key, "[FILTERED]"}, else: param)
 
   @spec format_method(atom()) :: String.t()
   defp format_method(method) do

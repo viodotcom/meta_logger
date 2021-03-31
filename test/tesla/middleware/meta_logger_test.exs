@@ -76,6 +76,25 @@ defmodule Tesla.Middleware.MetaLoggerTest do
       assert logs =~ "[debug] [#{inspect(Subject)}] ok"
     end
 
+    test "when a filtered query param is given, logs the message filtering the given query param" do
+      logs =
+        capture_log(fn ->
+          FakeClient.post("/ok", %{},
+            query: [{:page, 1}, {:user, "test_user"}, {"password", "test password"}],
+            opts: [filter_query_params: [:user, "password"]]
+          )
+        end)
+
+      assert logs =~
+               ~s([debug] [#{inspect(Subject)}] POST /ok [{:page, 1}, {:user, "[FILTERED]"}, {"password", "[FILTERED]"}] [])
+
+      assert logs =~
+               ~s([debug] [#{inspect(Subject)}] 200 ) <>
+                 ~s([{"content-type", "text/plain"}, {"authorization", "[FILTERED]"}])
+
+      assert logs =~ "[debug] [#{inspect(Subject)}] ok"
+    end
+
     test "when response is an error, logs the response with error log level" do
       logs = capture_log(fn -> FakeClient.get("/error") end)
 
