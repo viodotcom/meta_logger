@@ -8,9 +8,9 @@ defmodule Tesla.Middleware.MetaLoggerTest do
   defmodule FakeClient do
     use Tesla
 
-    plug(Subject, filter_headers: ["authorization"], log_level: :debug, log_tag: Subject)
+    plug Subject, filter_headers: ["authorization"], log_level: :debug, log_tag: Subject
 
-    adapter(fn env ->
+    adapter fn env ->
       env =
         Tesla.put_headers(env, [
           {"content-type", "text/plain"},
@@ -33,7 +33,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
         "/json" ->
           {:ok, %{env | status: 200, body: Jason.encode!(%{response: "value"})}}
       end
-    end)
+    end
   end
 
   describe "call/3" do
