@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add query params filtering to Tesla Middleware
 
+### Changed
+- Ensure Tesla is loaded before defining MetaLogger middleware to avoid
+compilation errors on projects without Tesla.
+
 ## [1.1.0] - 2020-12-16
 ### Added
 - Add Tesla middleware to log requests and responses.
