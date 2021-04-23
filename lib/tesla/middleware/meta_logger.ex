@@ -88,6 +88,13 @@ if Code.ensure_loaded?(Tesla) do
       result
     end
 
+    defp log_response({:error, reason} = result, options) do
+      level = response_log_level(result, options)
+      log(reason, level, options)
+
+      result
+    end
+
     @spec build_headers(Env.t(), Env.opts()) :: Env.headers()
     defp build_headers(%Env{headers: headers}, options) do
       filter_headers = Keyword.get(options, :filter_headers)
