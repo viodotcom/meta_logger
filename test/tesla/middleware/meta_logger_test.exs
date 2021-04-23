@@ -8,9 +8,13 @@ defmodule Tesla.Middleware.MetaLoggerTest do
   defmodule FakeClient do
     use Tesla
 
-    plug(Subject, filter_headers: ["authorization"], log_level: :debug, log_tag: Subject)
+    plug Subject,
+      filter_headers: ["authorization"],
+      filter_query_params: [:username],
+      log_level: :debug,
+      log_tag: Subject
 
-    adapter(fn env ->
+    adapter fn env ->
       env =
         Tesla.put_headers(env, [
           {"content-type", "text/plain"},
@@ -33,7 +37,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
         "/json" ->
           {:ok, %{env | status: 200, body: Jason.encode!(%{response: "value"})}}
       end
-    end)
+    end
   end
 
   describe "call/3" do
@@ -72,6 +76,39 @@ defmodule Tesla.Middleware.MetaLoggerTest do
       assert logs =~
                ~s([debug] [#{inspect(Subject)}] 200 ) <>
                  ~s([{"content-type", "[FILTERED]"}, {"authorization", "[FILTERED]"}])
+
+      assert logs =~ "[debug] [#{inspect(Subject)}] ok"
+    end
+
+    test "when a filtered query param is given, logs the message filtering the given query param" do
+      logs =
+        capture_log(fn ->
+          FakeClient.post("/ok", %{},
+            query: [{:page, 1}, {:user, "test_user"}, {"password", "test password"}],
+            opts: [filter_query_params: [:user, "password"]]
+          )
+        end)
+
+      assert logs =~
+               ~s([debug] [#{inspect(Subject)}] POST /ok [{:page, 1}, {:user, "[FILTERED]"}, {"password", "[FILTERED]"}] [])
+
+      assert logs =~
+               ~s([debug] [#{inspect(Subject)}] 200 ) <>
+                 ~s([{"content-type", "text/plain"}, {"authorization", "[FILTERED]"}])
+
+      assert logs =~ "[debug] [#{inspect(Subject)}] ok"
+    end
+
+    test "when a filtered query param is set on plug level, logs the message filtering the given query param" do
+      logs =
+        capture_log(fn -> FakeClient.post("/ok", %{}, query: [page: 1, username: "test_user"]) end)
+
+      assert logs =~
+               ~s([debug] [#{inspect(Subject)}] POST /ok [page: 1, username: "[FILTERED]"] [])
+
+      assert logs =~
+               ~s([debug] [#{inspect(Subject)}] 200 ) <>
+                 ~s([{"content-type", "text/plain"}, {"authorization", "[FILTERED]"}])
 
       assert logs =~ "[debug] [#{inspect(Subject)}] ok"
     end
