@@ -103,7 +103,7 @@ end
 # Using it:
 http_request
 # Inside the build function a logic can be defined to extract an useful payload which
-#  needs to be logged, e.g. request and response information
+# needs to be logged, e.g. a request and response information.
 |> ClientFormatterImpl.build()
 |> then(fn log_struct -> MetaLogger.log(:debug, log_struct) end)
 ```
