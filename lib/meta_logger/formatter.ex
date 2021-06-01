@@ -4,7 +4,7 @@ defprotocol MetaLogger.Formatter do
   """
   @fallback_to_any true
 
-  @spec format(struct()) :: String.t() | List.t()
+  @spec format(struct()) :: String.t() | list()
   def format(payload)
 
   defmodule IncorrectPayload do
@@ -27,7 +27,6 @@ defimpl MetaLogger.Formatter, for: Any do
       defimpl MetaLogger.Formatter, for: unquote(module) do
         @replacement "[FILTERED]"
 
-        @spec format(struct()) :: String.t() | List.t()
         def format(struct) do
           formatter_fn = Keyword.fetch!(unquote(options), :formatter_fn)
 
@@ -37,17 +36,14 @@ defimpl MetaLogger.Formatter, for: Any do
           |> filter()
         end
 
-        @spec filter(List.t()) :: List.t()
-        def filter(payload) when is_list(payload),
+        defp filter(payload) when is_list(payload),
           do: Enum.map(payload, &filter(&1))
 
-        @spec filter(String.t()) :: String.t()
-        def filter(payload) when is_bitstring(payload) do
+        defp filter(payload) when is_bitstring(payload) do
           Keyword.get(unquote(options), :filter_patterns)
           |> filter(payload)
         end
 
-        @spec filter(List.t(), String.t()) :: String.t()
         defp filter(patterns, payload) do
           Enum.reduce(patterns, payload, fn pattern, payload ->
             String.replace(payload, ~r/#{pattern}/, @replacement)
