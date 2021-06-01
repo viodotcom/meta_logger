@@ -41,20 +41,18 @@ defmodule MetaLogger do
       #{inspect(__MODULE__)}.log(:warn, fn -> {"dynamically calculated info", [additional: :metadata]} end)
 
   """
-  def log(_, _, metadata \\ [])
+  def log(level, payload, metadata \\ [])
 
-  @spec log(struct(), atom(), metadata()) :: :ok
-  def log(data_struct, level, metadata) when is_struct(data_struct) do
+  @spec log(atom(), struct() | list() | chardata_or_fun(), metadata()) :: :ok
+  def log(level, data_struct, metadata) when is_struct(data_struct) do
     formatted_log = MetaLogger.Formatter.format(data_struct)
 
     log(level, formatted_log, metadata)
   end
 
-  @spec log(atom(), List.t(), metadata()) :: :ok
   def log(level, logs, metadata) when is_atom(level) and is_list(logs),
     do: Enum.each(logs, &log(level, &1, metadata))
 
-  @spec log(atom(), chardata_or_fun(), metadata()) :: :ok
   def log(level, chardata_or_fun, metadata) when is_atom(level) do
     merge_logger_metadata_from_parent_processes()
 
