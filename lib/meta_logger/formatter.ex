@@ -2,6 +2,7 @@ defprotocol MetaLogger.Formatter do
   @doc """
   MetaLogger formatter protocol.
   """
+
   @fallback_to_any true
 
   @spec format(struct()) :: String.t() | list()
