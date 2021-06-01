@@ -82,6 +82,7 @@ The struct for which implementation will be used must have `payload` field which
 `MetaLogger.log/3` accepts the structs which derives `MetaLogger.Formatter` implementation.
 
 ### Usage
+
 ```elixir
 defmodule ClientFormatterImpl do
   @derive {
