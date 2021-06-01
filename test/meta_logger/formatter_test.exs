@@ -26,7 +26,7 @@ defmodule MetaLogger.FormatterTest do
     assert formatted_log == ["[FILTERED]", "the world"]
   end
 
-  test "raises an error when there is wrong struct given" do
+  test "when there is wrong struct given, raises an error" do
     defmodule WrongStruct do
       defstruct [:a]
     end
