@@ -71,7 +71,7 @@ defimpl MetaLogger.Formatter, for: Any do
       value: struct,
       description: """
       MetaLogger.Formatter protocol must always be explicitly implemented.
-      You need to define your own struct and derive MetaLogger.Formatter with `formatter_fn` and `filter_patterns` options.
+      You need to define your own struct and derive `MetaLogger.Formatter` with `formatter_fn` and `filter_patterns` options.
       The struct must have `payload` field which is given format function receives.
       Derive arguments:
         - `formatter_fn` is a function, which accepts payload. Returns bitstring or a list.
