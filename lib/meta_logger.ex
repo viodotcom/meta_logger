@@ -32,6 +32,7 @@ defmodule MetaLogger do
 
   @doc """
   Logs a message with given `level` keeping logger metadata from caller processes.
+  Can accept a custom struct if it implements MetaLogger.Formatter protocol.
   Returns `:ok` or an `{:error, reason}` tuple.
 
   ## Examples
