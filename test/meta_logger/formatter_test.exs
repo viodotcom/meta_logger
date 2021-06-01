@@ -11,7 +11,8 @@ defmodule MetaLogger.FormatterTest do
 
   test "accpets a correct struct and returns a formatted data" do
     formatted_log =
-      FormatterProtocolTest.build(%{be: "good", to: "the world"})
+      %{be: "good", to: "the world"}
+      |> FormatterProtocolTest.build()
       |> Subject.format()
 
     assert formatted_log == ["good", "the world"]
