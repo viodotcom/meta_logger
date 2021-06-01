@@ -21,6 +21,7 @@ defimpl MetaLogger.Formatter, for: Any do
   @moduledoc """
   Default implementation for any struct which used to be derived.
   """
+
   defmacro __deriving__(module, _struct, options) do
     formatter_func = fetch_formatter_function(options)
 
