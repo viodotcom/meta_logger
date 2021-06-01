@@ -1,6 +1,6 @@
 defprotocol MetaLogger.Formatter do
   @doc """
-  MetaLogger forrmatter protocol
+  MetaLogger formatter protocol.
   """
   @fallback_to_any true
 
