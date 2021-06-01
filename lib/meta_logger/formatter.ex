@@ -41,7 +41,8 @@ defimpl MetaLogger.Formatter, for: Any do
           do: Enum.map(payload, &filter(&1))
 
         defp filter(payload) when is_bitstring(payload) do
-          Keyword.get(unquote(options), :filter_patterns)
+          unquote(options)
+          |> Keyword.get(:filter_patterns)
           |> filter(payload)
         end
 
