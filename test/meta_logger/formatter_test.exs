@@ -51,7 +51,7 @@ defmodule MetaLogger.FormatterTest do
 
   test "raises the error when formatter function is not set" do
     assert_raise(MetaLogger.Formatter.IncorrectOrNotSetFormatterFunction, fn ->
-      defmodule IncorrectStruct do
+      defmodule IncorrectDerivedStruct do
         @derive Subject
         defstruct [:payload]
       end

@@ -55,7 +55,11 @@ defimpl MetaLogger.Formatter, for: Any do
         rescue
           FunctionClauseError ->
             reraise MetaLogger.Formatter.IncorrectPayload,
-              message: "Given formatter function doesn't accept a payload: #{inspect(args)}"
+                    [
+                      message:
+                        "Given formatter function doesn't accept a payload: #{inspect(args)}"
+                    ],
+                    __STACKTRACE__
         end
       end
     end
