@@ -9,7 +9,7 @@ defmodule MetaLogger.FormatterTest do
     on_exit(fn -> Logger.configure_backend(:console, metadata: []) end)
   end
 
-  test "accpets a correct struct and returns a formatted data" do
+  test "accepts a correct struct and returns a formatted data" do
     formatted_log =
       %{be: "good", to: "the world"}
       |> FormatterProtocolTest.build()
