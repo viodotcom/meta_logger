@@ -80,6 +80,7 @@ If you own the struct, you can derive the implementation specifying a formatter 
 The struct for which implementation will be used must have `payload` field which is used as input for defined format function.
 
 `MetaLogger.log/3` accepts the structs which derives `MetaLogger.Formatter` implementation.
+
 ### Usage
 ```elixir
 defmodule ClientFormatterImpl do
