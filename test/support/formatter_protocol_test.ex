@@ -1,4 +1,5 @@
 defmodule FormatterProtocolTest do
+  @moduledoc false
   @derive {MetaLogger.Formatter, formatter_fn: &__MODULE__.format/1, filter_patterns: ["bad"]}
   defstruct [:payload]
 

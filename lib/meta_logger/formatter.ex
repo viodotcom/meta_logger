@@ -7,11 +7,11 @@ defprotocol MetaLogger.Formatter do
   @spec format(struct()) :: String.t() | List.t()
   def format(payload)
 
-  defmodule BadPayload do
+  defmodule IncorrectPayload do
     defexception [:message]
   end
 
-  defmodule FormatterFunctionNotSet do
+  defmodule IncorrectOrNotSetFormatterFunction do
     defexception [:message]
   end
 end
@@ -55,13 +55,11 @@ defimpl MetaLogger.Formatter, for: Any do
         end
 
         defp safe_func_invoke(args) do
-          try do
-            unquote(Macro.escape(formatter_func)).(args)
-          rescue
-            FunctionClauseError ->
-              raise MetaLogger.Formatter.BadPayload,
-                message: "Given formatter function doesn't accept a payload: #{inspect(args)}"
-          end
+          unquote(Macro.escape(formatter_func)).(args)
+        rescue
+          FunctionClauseError ->
+            reraise MetaLogger.Formatter.IncorrectPayload,
+              message: "Given formatter function doesn't accept a payload: #{inspect(args)}"
         end
       end
     end
@@ -87,15 +85,14 @@ defimpl MetaLogger.Formatter, for: Any do
   end
 
   defp fetch_formatter_function(options) do
-    func =
-      case Keyword.fetch(options, :formatter_fn) do
-        {:ok, function} ->
-          function
+    case Keyword.fetch(options, :formatter_fn) do
+      {:ok, function} ->
+        function
 
-        :error ->
-          raise MetaLogger.Formatter.FormatterFunctionNotSet,
-            message:
-              "Formatter function must be provided, e.g. @derive {MetaLogger.Formatter, formatter_fn: &__MODULE__.format/1}"
-      end
+      :error ->
+        raise MetaLogger.Formatter.IncorrectOrNotSetFormatterFunction,
+          message:
+            "Formatter function must be provided, e.g. @derive {MetaLogger.Formatter, formatter_fn: &__MODULE__.format/1}"
+    end
   end
 end

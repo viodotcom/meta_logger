@@ -44,13 +44,13 @@ defmodule MetaLogger.FormatterTest do
 
     my_struct = struct!(IncorrectStruct, payload: %{a: "1"})
 
-    assert_raise(MetaLogger.Formatter.BadPayload, fn ->
+    assert_raise(MetaLogger.Formatter.IncorrectPayload, fn ->
       Subject.format(my_struct)
     end)
   end
 
   test "raises the error when formatter function is not set" do
-    assert_raise(MetaLogger.Formatter.FormatterFunctionNotSet, fn ->
+    assert_raise(MetaLogger.Formatter.IncorrectOrNotSetFormatterFunction, fn ->
       defmodule IncorrectStruct do
         @derive Subject
         defstruct [:payload]
