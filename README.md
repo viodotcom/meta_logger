@@ -109,6 +109,7 @@ http_request
 ```
 
 ### Options
+
 * `:formatter_fn` (required) - The function which is used to format a given payload. The function must return a string or a list of strings.
 * `:filter_patterns` (optional) - Regex patterns which will be used to replace sensitive information in a payload
 
