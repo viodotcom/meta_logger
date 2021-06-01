@@ -74,6 +74,7 @@ end
 * `:log_tag` - The log tag to be prefixed in the logs, default to: `#{inspect(__MODULE__)}`.
 
 ## MetaLogger.Formatter protocol
+
 It is possible to define an implementation for a custom struct, so MetaLogger will know how to format log messages. It also includes the possibility to filter some data using regexp patterns.
 It could be useful, when there is defined a struct with sensitive information, for example after an HTTP request.
 If you own the struct, you can derive the implementation specifying a formatter function and patterns which will be filtered.
