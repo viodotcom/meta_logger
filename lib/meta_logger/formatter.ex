@@ -75,7 +75,7 @@ defimpl MetaLogger.Formatter, for: Any do
       The struct must have `payload` field which is given format function receives.
       Derive arguments:
         - `formatter_fn` is a function, which accepts payload. Returns bitstring or a list.
-        - `filter_patterns` is a list of patterns which will be used for regexp what shuold be filtered (replaced)
+        - `filter_patterns` is a list of patterns that will be used for regexp what should be filtered (replaced)
 
       Example of usage:
           @derive {MetaLogger.Formatter, formatter_fn: &Module.func/1, filter_patterns: [~s("email":".*")]}
