@@ -78,6 +78,8 @@ It is possible to define an implementation for a custom struct, so MetaLogger wi
 It could be useful, when there is defined a struct with sensitive information, for example after an HTTP request.
 If you own the struct, you can derive the implementation specifying a formatter function and patterns which will be filtered.
 The struct for which implementation will be used must have `payload` field which is used as input for defined format function.
+
+`MetaLogger.log/3` accepts the structs which derives `MetaLogger.Formatter` implementation.
 ### Usage
 ```elixir
 defmodule ClientFormatterImpl do
@@ -105,7 +107,7 @@ http_request
 ```
 
 ### Options
-* `:formatter_fn` (required) - The function which is used to format a given payload.
+* `:formatter_fn` (required) - The function which is used to format a given payload. The function must return a string or a list of strings.
 * `:filter_patterns` (optional) - Regex patterns which will be used to replace sensitive information in a payload
 
 ## Release
