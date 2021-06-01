@@ -9,8 +9,6 @@ defmodule MetaLogger do
   @type metadata :: keyword()
   @metadata ~w(dictionary $logger_metadata$)a
 
-  defdelegate format(payload), to: MetaLogger.Formatter
-
   Enum.each(~w(debug error info warn)a, fn level ->
     @doc """
     Logs a #{level} message keeping logger metadata from caller processes.
