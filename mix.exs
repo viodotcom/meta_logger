@@ -7,17 +7,22 @@ defmodule MetaLogger.MixProject do
   def project do
     [
       app: :meta_logger,
+      consolidate_protocols: Mix.env() != :test,
       deps: deps(),
       description: "Keep logger metadata from caller processes",
       dialyzer: dialyzer(),
       docs: docs(),
       elixir: "~> 1.10",
+      elixirc_paths: elixirc_paths(Mix.env()),
       package: package(),
       source_url: @source_url,
       start_permanent: Mix.env() == :prod,
       version: @version
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   def application do
     [
