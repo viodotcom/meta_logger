@@ -51,12 +51,15 @@ defmodule MetaLogger.FormatterTest do
   end
 
   test "raises the error when formatter function is not set" do
-    assert_raise(MetaLogger.Formatter.IncorrectOrNotSetFormatterFunction, fn ->
-      defmodule IncorrectDerivedStruct do
-        @derive Subject
-        defstruct [:payload]
-      end
-    end).message =~
-      "Formatter function must be provided, e.g. @derive {MetaLogger.Formatter, formatter_fn: &__MODULE__.format/1}"
+    error =
+      assert_raise(MetaLogger.Formatter.IncorrectOrNotSetFormatterFunction, fn ->
+        defmodule IncorrectDerivedStruct do
+          @derive Subject
+          defstruct [:payload]
+        end
+      end)
+
+    assert error.message =~
+             "Formatter function must be provided, e.g. @derive {MetaLogger.Formatter, formatter_fn: &__MODULE__.format/1}"
   end
 end
