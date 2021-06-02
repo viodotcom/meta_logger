@@ -73,6 +73,50 @@ end
   HTTP status 400 and above will be logged with `:error`, and redirect with `:warn`.
 * `:log_tag` - The log tag to be prefixed in the logs, default to: `#{inspect(__MODULE__)}`.
 
+## MetaLogger.Formatter protocol
+
+It is possible to define an implementation for a custom struct, so MetaLogger will know how to format log messages. It also includes the possibility to filter some data using regexp patterns.
+
+It could be useful, when there is defined a struct with sensitive information, for example after an HTTP request.
+
+If you own the struct, you can derive the implementation specifying a formatter function and patterns which will be filtered.
+
+The struct for which implementation will be used must have `payload` field which is used as input for defined format function.
+
+`MetaLogger.log/3` accepts the structs which derives `MetaLogger.Formatter` implementation.
+
+### Usage
+
+```elixir
+defmodule ClientFormatterImpl do
+  @derive {
+    MetaLogger.Formatter,
+    formatter_fn: &__MODULE__.format/1,
+    filter_patterns: [~s("email":".*")]
+  }
+
+  def build(payload) do
+    struct!(__MODULE__, payload: payload)
+  end
+
+  def format(%{foo: foo}) do
+    "Very useful but filtered information: #{inspect(foo)}"
+  end
+end
+
+# Using it:
+http_request
+# Inside the build function a logic can be defined to extract an useful payload which
+# needs to be logged, e.g. a request and response information.
+|> ClientFormatterImpl.build()
+|> then(fn log_struct -> MetaLogger.log(:debug, log_struct) end)
+```
+
+### Options
+
+* `:formatter_fn` (required) - The function which is used to format a given payload. The function must return a string or a list of strings.
+* `:filter_patterns` (optional) - Regex patterns which will be used to replace sensitive information in a payload.
+
 ## Release
 
 After merge a new feature/bug you can bump and publish it with:

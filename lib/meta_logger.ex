@@ -30,6 +30,9 @@ defmodule MetaLogger do
 
   @doc """
   Logs a message with given `level` keeping logger metadata from caller processes.
+
+  Can accept a custom struct if it implements MetaLogger.Formatter protocol.
+
   Returns `:ok` or an `{:error, reason}` tuple.
 
   ## Examples
@@ -39,8 +42,19 @@ defmodule MetaLogger do
       #{inspect(__MODULE__)}.log(:warn, fn -> {"dynamically calculated info", [additional: :metadata]} end)
 
   """
-  @spec log(atom(), chardata_or_fun(), metadata()) :: :ok
-  def log(level, chardata_or_fun, metadata \\ []) do
+  @spec log(atom(), struct() | list() | chardata_or_fun(), metadata()) :: :ok
+  def log(level, payload, metadata \\ [])
+
+  def log(level, data_struct, metadata) when is_struct(data_struct) do
+    formatted_log = MetaLogger.Formatter.format(data_struct)
+
+    log(level, formatted_log, metadata)
+  end
+
+  def log(level, logs, metadata) when is_atom(level) and is_list(logs),
+    do: Enum.each(logs, &log(level, &1, metadata))
+
+  def log(level, chardata_or_fun, metadata) when is_atom(level) do
     merge_logger_metadata_from_parent_processes()
 
     Logger.log(level, chardata_or_fun, metadata)

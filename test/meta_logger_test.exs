@@ -115,4 +115,18 @@ defmodule MetaLoggerTest do
       end
     end)
   end
+
+  describe "MetaLogger Formatter" do
+    test "logs a given data using formatter implementation" do
+      my_struct = FormatterProtocolTest.build(%{be: "good", to: "the world"})
+
+      logs =
+        capture_log(fn ->
+          Subject.log(:info, my_struct)
+        end)
+
+      assert logs =~ "good"
+      assert logs =~ "the world"
+    end
+  end
 end
