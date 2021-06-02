@@ -3,12 +3,6 @@ defmodule MetaLogger.FormatterTest do
 
   alias MetaLogger.Formatter, as: Subject
 
-  setup do
-    Logger.configure_backend(:console, metadata: [:foo, :bar, :baz])
-
-    on_exit(fn -> Logger.configure_backend(:console, metadata: []) end)
-  end
-
   describe "format/1" do
     test "accepts a correct struct and returns a formatted data" do
       formatted_log =
