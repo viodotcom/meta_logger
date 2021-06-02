@@ -66,7 +66,8 @@ defmodule MetaLogger.MixProject do
         "Antonio Lorusso",
         "Felipe Vieira",
         "Fernando Hamasaki de Amorim",
-        "Sergio Rodrigues"
+        "Sergio Rodrigues",
+        "Dmitriy Tymchuk"
       ],
       name: "meta_logger"
     }
