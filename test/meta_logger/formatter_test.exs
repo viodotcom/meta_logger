@@ -9,57 +9,59 @@ defmodule MetaLogger.FormatterTest do
     on_exit(fn -> Logger.configure_backend(:console, metadata: []) end)
   end
 
-  test "accepts a correct struct and returns a formatted data" do
-    formatted_log =
-      %{be: "good", to: "the world"}
-      |> FormatterProtocolTest.build()
-      |> Subject.format()
+  describe "format/1" do
+    test "accepts a correct struct and returns a formatted data" do
+      formatted_log =
+        %{be: "good", to: "the world"}
+        |> FormatterProtocolTest.build()
+        |> Subject.format()
 
-    assert formatted_log == ["good", "the world"]
-  end
-
-  test "filters elements by a given pattern" do
-    formatted_log =
-      FormatterProtocolTest.build(%{be: "bad", to: "the world"})
-      |> Subject.format()
-
-    assert formatted_log == ["[FILTERED]", "the world"]
-  end
-
-  test "when there is wrong struct given, raises an error" do
-    defmodule WrongStruct do
-      defstruct [:a]
+      assert formatted_log == ["good", "the world"]
     end
 
-    assert_raise(Protocol.UndefinedError, fn ->
-      Subject.format(WrongStruct)
-    end)
-  end
+    test "filters elements by a given pattern" do
+      formatted_log =
+        FormatterProtocolTest.build(%{be: "bad", to: "the world"})
+        |> Subject.format()
 
-  test "raises the error when a payload for format function is incorrect" do
-    defmodule IncorrectStruct do
-      @derive {Subject, formatter_fn: &__MODULE__.format/1}
-      defstruct [:payload]
-      def format(%{b: b}), do: b
+      assert formatted_log == ["[FILTERED]", "the world"]
     end
 
-    my_struct = struct!(IncorrectStruct, payload: %{a: "1"})
+    test "when there is wrong struct given, raises an error" do
+      defmodule WrongStruct do
+        defstruct [:a]
+      end
 
-    assert_raise(MetaLogger.Formatter.IncorrectPayload, fn ->
-      Subject.format(my_struct)
-    end)
-  end
-
-  test "raises the error when formatter function is not set" do
-    error =
-      assert_raise(MetaLogger.Formatter.IncorrectOrNotSetFormatterFunction, fn ->
-        defmodule IncorrectDerivedStruct do
-          @derive Subject
-          defstruct [:payload]
-        end
+      assert_raise(Protocol.UndefinedError, fn ->
+        Subject.format(WrongStruct)
       end)
+    end
 
-    assert error.message =~
-             "Formatter function must be provided, e.g. @derive {MetaLogger.Formatter, formatter_fn: &__MODULE__.format/1}"
+    test "raises the error when a payload for format function is incorrect" do
+      defmodule IncorrectStruct do
+        @derive {Subject, formatter_fn: &__MODULE__.format/1}
+        defstruct [:payload]
+        def format(%{b: b}), do: b
+      end
+
+      my_struct = struct!(IncorrectStruct, payload: %{a: "1"})
+
+      assert_raise(MetaLogger.Formatter.IncorrectPayload, fn ->
+        Subject.format(my_struct)
+      end)
+    end
+
+    test "raises the error when formatter function is not set" do
+      error =
+        assert_raise(MetaLogger.Formatter.IncorrectOrNotSetFormatterFunction, fn ->
+          defmodule IncorrectDerivedStruct do
+            @derive Subject
+            defstruct [:payload]
+          end
+        end)
+
+      assert error.message =~
+               "Formatter function must be provided, e.g. @derive {MetaLogger.Formatter, formatter_fn: &__MODULE__.format/1}"
+    end
   end
 end
