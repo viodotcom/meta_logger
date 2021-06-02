@@ -42,9 +42,9 @@ defmodule MetaLogger do
       #{inspect(__MODULE__)}.log(:warn, fn -> {"dynamically calculated info", [additional: :metadata]} end)
 
   """
+  @spec log(atom(), struct() | list() | chardata_or_fun(), metadata()) :: :ok
   def log(level, payload, metadata \\ [])
 
-  @spec log(atom(), struct() | list() | chardata_or_fun(), metadata()) :: :ok
   def log(level, data_struct, metadata) when is_struct(data_struct) do
     formatted_log = MetaLogger.Formatter.format(data_struct)
 
