@@ -52,7 +52,7 @@ defmodule MetaLogger.FormatterTest do
       end)
     end
 
-    test "raises the error when formatter function is not set" do
+    test "when formatter function is not set, raises the error" do
       error =
         assert_raise(MetaLogger.Formatter.IncorrectOrNotSetFormatterFunction, fn ->
           defmodule IncorrectDerivedStruct do
