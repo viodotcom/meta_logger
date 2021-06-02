@@ -14,7 +14,7 @@ by adding `meta_logger` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:meta_logger, "~> 1.2.0"}
+    {:meta_logger, "~> 1.3.0"}
   ]
 end
 ```
