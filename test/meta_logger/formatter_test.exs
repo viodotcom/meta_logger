@@ -21,7 +21,8 @@ defmodule MetaLogger.FormatterTest do
 
     test "filters elements by a given pattern" do
       formatted_log =
-        FormatterProtocolTest.build(%{be: "bad", to: "the world"})
+        %{be: "bad", to: "the world"}
+        |> FormatterProtocolTest.build()
         |> Subject.format()
 
       assert formatted_log == ["[FILTERED]", "the world"]
@@ -37,7 +38,7 @@ defmodule MetaLogger.FormatterTest do
       end)
     end
 
-    test "raises the error when a payload for format function is incorrect" do
+    test "when a payload for format function is incorrect, raises the error" do
       defmodule IncorrectStruct do
         @derive {Subject, formatter_fn: &__MODULE__.format/1}
         defstruct [:payload]
