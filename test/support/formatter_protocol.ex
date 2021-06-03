@@ -1,6 +1,11 @@
 defmodule FormatterProtocolTest do
   @moduledoc false
-  @derive {MetaLogger.Formatter, formatter_fn: &__MODULE__.format/1, filter_patterns: ["bad"]}
+  @filter_patterns [
+    "bad",
+    {~s/"name":".*"/, ~s/"name":"[FILTERED]"/}
+  ]
+  @derive {MetaLogger.Formatter,
+           formatter_fn: &__MODULE__.format/1, filter_patterns: @filter_patterns}
   defstruct [:payload]
 
   def build(my_data) do

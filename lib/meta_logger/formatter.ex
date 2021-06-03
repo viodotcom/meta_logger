@@ -27,7 +27,7 @@ defimpl MetaLogger.Formatter, for: Any do
 
     quote do
       defimpl MetaLogger.Formatter, for: unquote(module) do
-        @replacement "[FILTERED]"
+        @default_replacement "[FILTERED]"
 
         def format(struct) do
           formatter_fn = Keyword.fetch!(unquote(options), :formatter_fn)
@@ -48,8 +48,12 @@ defimpl MetaLogger.Formatter, for: Any do
         end
 
         defp filter(patterns, payload) do
-          Enum.reduce(patterns, payload, fn pattern, payload ->
-            String.replace(payload, ~r/#{pattern}/, @replacement)
+          Enum.reduce(patterns, payload, fn
+            {pattern, replacement}, payload ->
+              String.replace(payload, ~r/#{pattern}/, replacement)
+
+            pattern, payload when is_bitstring(pattern) ->
+              String.replace(payload, ~r/#{pattern}/, @default_replacement)
           end)
         end
 
