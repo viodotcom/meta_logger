@@ -92,7 +92,10 @@ defmodule ClientFormatterImpl do
   @derive {
     MetaLogger.Formatter,
     formatter_fn: &__MODULE__.format/1,
-    filter_patterns: [~s("email":".*")]
+    filter_patterns: [
+      {~s/"name":".*"/, ~s/"name":"[FILTERED]"/},
+      "very_secret_word"
+    ]
   }
 
   def build(payload) do
@@ -115,7 +118,7 @@ http_request
 ### Options
 
 * `:formatter_fn` (required) - The function which is used to format a given payload. The function must return a string or a list of strings.
-* `:filter_patterns` (optional) - Regex patterns which will be used to replace sensitive information in a payload.
+* `:filter_patterns` (optional) - Regex patterns which will be used to replace sensitive information in a payload. It is a list of strings or tuples (can be mixed). If tuples are given, the first element is used as a regex pattern to match, and the second is as a replacement which will be used to replace it, e.g. `{~s/"name": ".+"/, ~s/"name": "[FILTERED]"/}`.
 
 ## Release
 

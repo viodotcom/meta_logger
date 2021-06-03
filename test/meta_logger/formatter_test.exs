@@ -22,6 +22,15 @@ defmodule MetaLogger.FormatterTest do
       assert formatted_log == ["[FILTERED]", "the world"]
     end
 
+    test "when filters given as tuples, uses given replacement instead a default one" do
+      formatted_log =
+        %{be: "good", to: ~s/{"name":"John"}/}
+        |> FormatterProtocolTest.build()
+        |> Subject.format()
+
+      assert formatted_log == ["good", ~s/{"name":"[FILTERED]"}/]
+    end
+
     test "when there is wrong struct given, raises an error" do
       defmodule WrongStruct do
         defstruct [:a]
