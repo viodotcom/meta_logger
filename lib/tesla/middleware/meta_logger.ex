@@ -12,10 +12,12 @@ if Code.ensure_loaded?(Tesla) do
         use Tesla
 
       plug #{inspect(__MODULE__)},
+        filter_body: [{~r/"email":".*?"/, ~s("email":"[FILTERED]")}],
         filter_headers: ["authorization"],
         filter_query_params: [:api_key],
         log_level: :debug,
-        log_tag: MyApp
+        log_tag: MyApp,
+        max_entry_length: :infinity
     end
 
     ## Options
@@ -24,14 +26,23 @@ if Code.ensure_loaded?(Tesla) do
     the values will be replaced with `[FILTERED]`, defaults to: `[]`.
     * `:filter_query_params` - The query params that should not be logged,
     the values will be replaced with `[FILTERED]`, defaults to: `[]`
+    * `:filter_body` - The request and response body patterns that should not be logged,
+    each filter can be just a pattern, wich will be replaced by `"[FILTERED]"`, or it
+    can be a tuple with the pattern and the replacement. Because the body filtering is
+    applied to strings it is necessary that this middleware is the last one on the stack, so
+    it receives the request body already encoded and the response body not yet decoded. If the
+    body is not a string, the filtering will be skipped.
     * `:log_level` - The log level to be used, defaults to: `:info`. Responses with
     HTTP status 400 and above will be logged with `:error`, and redirect with `:warn`.
     * `:log_tag` - The log tag to be prefixed in the logs, default to: `#{inspect(__MODULE__)}`.
+    * `max_entry_length` - The maximum length of a log entry before it is splitted into new
+    ones. Defaults to `:infinity`.
 
     """
 
     require Logger
 
+    alias MetaLogger.Slicer
     alias Tesla.{Env, Middleware}
 
     @behaviour Middleware
@@ -55,11 +66,15 @@ if Code.ensure_loaded?(Tesla) do
     defp prepare_options(middleware_options, env_options) do
       middleware_options
       |> Keyword.merge(env_options, fn _key, _middleware_value, env_value -> env_value end)
-      |> maybe_put_default_value(:filter_headers, [])
-      |> maybe_put_default_value(:filter_query_params, [])
+      |> maybe_put_default_values(~w(filter_body filter_headers filter_query_params)a, [])
       |> maybe_put_default_value(:log_level, :info)
       |> maybe_put_default_value(:log_tag, __MODULE__)
+      |> maybe_put_default_value(:max_entry_length, :infinity)
     end
+
+    @spec maybe_put_default_values(Env.opts(), [atom()], any()) :: Env.opts()
+    defp maybe_put_default_values(options, keys, default_value),
+      do: Enum.reduce(keys, options, &maybe_put_default_value(&2, &1, default_value))
 
     @spec maybe_put_default_value(Env.opts(), atom(), any()) :: Env.opts()
     defp maybe_put_default_value(options, key, default_value),
@@ -70,6 +85,7 @@ if Code.ensure_loaded?(Tesla) do
       level = Keyword.get(options, :log_level)
       headers = build_headers(env, options)
       query = build_query(query, options)
+      body = build_body(body, options)
 
       log([format_method(method), url, inspect(query), inspect(headers)], level, options)
       log(body, level, options)
@@ -81,6 +97,7 @@ if Code.ensure_loaded?(Tesla) do
     defp log_response({:ok, %Env{body: body, status: status} = env} = result, options) do
       level = response_log_level(result, options)
       headers = build_headers(env, options)
+      body = build_body(body, options)
 
       log([status, inspect(headers)], level, options)
       log(body, level, options)
@@ -116,6 +133,19 @@ if Code.ensure_loaded?(Tesla) do
     defp filter_query_params({key, _value} = param, filter_query_params),
       do: if(key in filter_query_params, do: {key, @filtered}, else: param)
 
+    @spec build_body(Env.body(), Env.opts()) :: Env.body()
+    defp build_body(body, options) when is_binary(body) do
+      options
+      |> Keyword.get(:filter_body)
+      |> Enum.reduce(body, &filter_body(&2, &1))
+    end
+
+    defp build_body(body, _options), do: body
+
+    @spec filter_body(Env.body(), {Regex.t(), String.t()} | Regex.t()) :: Env.body()
+    defp filter_body(body, {pattern, replacement}), do: String.replace(body, pattern, replacement)
+    defp filter_body(body, pattern), do: String.replace(body, pattern, @filtered)
+
     @spec response_log_level(Env.result(), Env.opts()) :: Logger.level()
     defp response_log_level({:error, _any}, _options), do: :error
     defp response_log_level({:ok, %Env{status: status}}, _options) when status >= 400, do: :error
@@ -139,14 +169,24 @@ if Code.ensure_loaded?(Tesla) do
     end
 
     defp log(message, level, options) when is_binary(message) do
+      max_entry_length = Keyword.get(options, :max_entry_length)
+
+      message
+      |> Slicer.slice(max_entry_length)
+      |> Enum.map(&prepend_tag(&1, options))
+      |> Enum.each(&MetaLogger.log(level, &1))
+    end
+
+    defp log(message, level, options), do: log(inspect(message), level, options)
+
+    @spec prepend_tag(String.t(), Env.opts()) :: String.t()
+    defp prepend_tag(message, options) do
       tag =
         options
         |> Keyword.get(:log_tag)
         |> inspect()
 
-      MetaLogger.log(level, Miss.String.build("[", tag, "] ", message))
+      Miss.String.build("[", tag, "] ", message)
     end
-
-    defp log(message, level, options), do: log(inspect(message), level, options)
   end
 end

@@ -56,22 +56,32 @@ defmodule MyClient do
   use Tesla
 
   plug #{inspect(__MODULE__)},
+    filter_body: {~r/email=.*&/, "email=[FILTERED]&"}
     filter_headers: ["authorization"],
     filter_query_params: [:api_key],
     log_level: :debug,
-    log_tag: MyApp
+    log_tag: MyApp,
+    max_entry_length: 22_000
 end
 ```
 
 ### Options
 
-* `:filter_headers` - The headers that should not be logged,
+- `:filter_headers` - The headers that should not be logged,
   the values will be replaced with `[FILTERED]`, defaults to: `[]`.
-* `:filter_query_params` - The query params that should not be logged,
-    the values will be replaced with `[FILTERED]`, defaults to: `[]`.
-* `:log_level` - The log level to be used, defaults to: `:info`. Responses with
+- `:filter_query_params` - The query params that should not be logged,
+  the values will be replaced with `[FILTERED]`, defaults to: `[]`.
+- `:filter_body` - The request and response body patterns that should not be logged,
+  each filter can be just a pattern, wich will be replaced by `"[FILTERED]"`, or it
+  can be a tuple with the pattern and the replacement. Because the body filtering is
+  applied to strings it is necessary that this middleware is the last one on the stack, so
+  it receives the request body already encoded and the response body not yet decoded. If the
+  body is not a string, the filtering will be skipped.
+- `:log_level` - The log level to be used, defaults to: `:info`. Responses with
   HTTP status 400 and above will be logged with `:error`, and redirect with `:warn`.
-* `:log_tag` - The log tag to be prefixed in the logs, default to: `#{inspect(__MODULE__)}`.
+- `:log_tag` - The log tag to be prefixed in the logs, default to: `#{inspect(__MODULE__)}`.
+- `max_entry_length` - The maximum length of a log entry before it is splitted into new
+  ones. Defaults to `:infinity`.
 
 ## MetaLogger.Formatter protocol
 
@@ -117,8 +127,8 @@ http_request
 
 ### Options
 
-* `:formatter_fn` (required) - The function which is used to format a given payload. The function must return a string or a list of strings.
-* `:filter_patterns` (optional) - Regex patterns which will be used to replace sensitive information in a payload. It is a list of strings or tuples (can be mixed). If tuples are given, the first element is used as a regex pattern to match, and the second is as a replacement which will be used to replace it, e.g. `{~s/"name": ".+"/, ~s/"name": "[FILTERED]"/}`.
+- `:formatter_fn` (required) - The function which is used to format a given payload. The function must return a string or a list of strings.
+- `:filter_patterns` (optional) - Regex patterns which will be used to replace sensitive information in a payload. It is a list of strings or tuples (can be mixed). If tuples are given, the first element is used as a regex pattern to match, and the second is as a replacement which will be used to replace it, e.g. `{~s/"name": ".+"/, ~s/"name": "[FILTERED]"/}`.
 
 ## Release
 
@@ -130,4 +140,5 @@ make publish
 ```
 
 ## License
+
 `meta_logger` source code is released under Apache 2 License. Check the [LICENSE](./LICENSE) file for more information.
