@@ -8,13 +8,15 @@ defmodule Tesla.Middleware.MetaLoggerTest do
   defmodule FakeClient do
     use Tesla
 
-    plug Subject,
+    plug(Subject,
       filter_headers: ["authorization"],
       filter_query_params: [:username],
+      filter_body: [{~r/"email":".*?"/, ~s("email":"[FILTERED]")}],
       log_level: :debug,
       log_tag: Subject
+    )
 
-    adapter fn env ->
+    adapter(fn env ->
       env =
         Tesla.put_headers(env, [
           {"content-type", "text/plain"},
@@ -35,22 +37,38 @@ defmodule Tesla.Middleware.MetaLoggerTest do
           {:ok, %{env | status: 200, body: "ok"}}
 
         "/json" ->
-          {:ok, %{env | status: 200, body: Jason.encode!(%{response: "value"})}}
+          {:ok, %{env | status: 200, body: ~s({"email":"foo@bar.baz","response":"value"})}}
       end
-    end
+    end)
   end
 
   describe "call/3" do
     test "logs the request and response" do
-      logs = capture_log(fn -> FakeClient.get("/ok") end)
+      logs = capture_log(fn -> FakeClient.get("/ok", query: [page: 1, username: "test_user"]) end)
 
-      assert logs =~ ~s([debug] [#{inspect(Subject)}] GET /ok [] [])
+      assert logs =~
+               ~s([debug] [#{inspect(Subject)}] GET /ok [page: 1, username: "[FILTERED]"] [])
 
       assert logs =~
                "[debug] [#{inspect(Subject)}] 200 " <>
                  ~s([{"content-type", "text/plain"}, {"authorization", "[FILTERED]"}])
 
       assert logs =~ "[debug] [#{inspect(Subject)}] ok"
+    end
+
+    test "when body is given logs the request and response" do
+      logs = capture_log(fn -> FakeClient.post("/json", ~s({"email":"foo@bar.baz"})) end)
+
+      assert logs =~
+               ~s([debug] [#{inspect(Subject)}] POST /json [] [])
+
+      assert logs =~ ~s([debug] [#{inspect(Subject)}] {"email":"[FILTERED]"})
+
+      assert logs =~
+               "[debug] [#{inspect(Subject)}] 200 " <>
+                 ~s([{"content-type", "text/plain"}, {"authorization", "[FILTERED]"}])
+
+      assert logs =~ ~s([debug] [#{inspect(Subject)}] {"email":"[FILTERED]","response":"value"})
     end
 
     test "when log level is given, logs the message with given level" do
@@ -90,7 +108,8 @@ defmodule Tesla.Middleware.MetaLoggerTest do
         end)
 
       assert logs =~
-               ~s([debug] [#{inspect(Subject)}] POST /ok [{:page, 1}, {:user, "[FILTERED]"}, {"password", "[FILTERED]"}] [])
+               ~s([debug] [#{inspect(Subject)}] POST /ok [{:page, 1}, {:user, "[FILTERED]"}, ) <>
+                 ~s({"password", "[FILTERED]"}] [])
 
       assert logs =~
                ~s([debug] [#{inspect(Subject)}] 200 ) <>
@@ -99,18 +118,46 @@ defmodule Tesla.Middleware.MetaLoggerTest do
       assert logs =~ "[debug] [#{inspect(Subject)}] ok"
     end
 
-    test "when a filtered query param is set on plug level, logs the message filtering the given query param" do
+    test "when a filtered body is given, logs the message filtering the given body patterns" do
       logs =
-        capture_log(fn -> FakeClient.post("/ok", %{}, query: [page: 1, username: "test_user"]) end)
+        capture_log(fn ->
+          FakeClient.post("/json", ~s({"password":"0123456789","somethingsafe":"ok"}),
+            opts: [filter_body: [~r/"password":".*?"/]]
+          )
+        end)
 
       assert logs =~
-               ~s([debug] [#{inspect(Subject)}] POST /ok [page: 1, username: "[FILTERED]"] [])
+               ~s([debug] [#{inspect(Subject)}] POST /json [] [])
+
+      assert logs =~ ~s([debug] [#{inspect(Subject)}] {[FILTERED],"somethingsafe":"ok"})
 
       assert logs =~
                ~s([debug] [#{inspect(Subject)}] 200 ) <>
                  ~s([{"content-type", "text/plain"}, {"authorization", "[FILTERED]"}])
 
-      assert logs =~ "[debug] [#{inspect(Subject)}] ok"
+      assert logs =~ ~s([debug] [#{inspect(Subject)}] {"email":"foo@bar.baz","response":"value"})
+    end
+
+    test "when max entry length is given, " <>
+           "logs the request and response splitting the entries" do
+      body_prefix = String.duplicate("a", 80)
+
+      logs =
+        capture_log(fn ->
+          FakeClient.post("/json", body_prefix <> "b", opts: [max_entry_length: 80])
+        end)
+
+      assert logs =~
+               ~s([debug] [#{inspect(Subject)}] POST /json [] [])
+
+      assert logs =~ ~s([debug] [#{inspect(Subject)}] #{body_prefix}\n)
+      assert logs =~ ~s([debug] [#{inspect(Subject)}] b\n)
+
+      assert logs =~
+               "[debug] [#{inspect(Subject)}] 200 " <>
+                 ~s([{"content-type", "text/plain"}, {"authorization", "[FILTERED]"}])
+
+      assert logs =~ ~s([debug] [#{inspect(Subject)}] {"email":"[FILTERED]","response":"value"})
     end
 
     test "when response is an error, logs the response with error log level" do
@@ -146,7 +193,6 @@ defmodule Tesla.Middleware.MetaLoggerTest do
 
     test "when response body is a JSON, logs the message as a proper JSON" do
       encoded_body = Jason.encode!(%{something: 1})
-      encoded_response = Jason.encode!(%{response: "value"})
 
       logs = capture_log(fn -> FakeClient.post("/json", encoded_body) end)
 
@@ -157,7 +203,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
                "[debug] [#{inspect(Subject)}] 200 " <>
                  ~s([{"content-type", "text/plain"}, {"authorization", "[FILTERED]"}])
 
-      assert logs =~ "[debug] [#{inspect(Subject)}] #{encoded_response}"
+      assert logs =~ ~s([debug] [#{inspect(Subject)}] {"email":"[FILTERED]","response":"value"})
     end
   end
 end
