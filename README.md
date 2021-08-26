@@ -2,7 +2,7 @@
 
 ![meta_logger](https://github.com/FindHotel/meta_logger/workflows/meta_logger/badge.svg?branch=master)
 
-Wrapper for Elixir.Logger that keeps logger metadata from caller processes.
+Wrapper for Elixir.Logger that keeps and returns logger metadata from caller processes.
 
 ## Installation
 
@@ -29,6 +29,10 @@ Just replace `Logger` with `MetaLogger`, there's no need to require it before us
 
 ```elixir
 MetaLogger.[debug|error|info|log|warn](...)
+```
+
+```elixir
+MetaLogger.metadata()
 ```
 
 ## Tesla Middleware

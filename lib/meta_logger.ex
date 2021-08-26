@@ -5,9 +5,11 @@ defmodule MetaLogger do
 
   require Logger
 
+  @metadata ~w(dictionary $logger_metadata$)a
+
   @type chardata_or_fun :: IO.chardata() | String.Chars.t() | (any() -> any())
   @type metadata :: keyword()
-  @metadata ~w(dictionary $logger_metadata$)a
+  @type payload :: struct() | list() | chardata_or_fun()
 
   Enum.each(~w(debug error info warn)a, fn level ->
     @doc """
@@ -16,13 +18,18 @@ defmodule MetaLogger do
 
     ## Examples
 
-        #{inspect(__MODULE__)}.#{level}("hello?")
-        #{inspect(__MODULE__)}.#{level}(fn -> "dynamically calculated debug" end)
-        #{inspect(__MODULE__)}.#{level}(fn -> {"dynamically calculated #{level}", [additional: :metadata]} end)
+        iex> #{inspect(__MODULE__)}.#{level}("hello?")
+        :ok
+
+        iex> #{inspect(__MODULE__)}.#{level}(fn -> "dynamically calculated debug" end)
+        :ok
+
+        iex> #{inspect(__MODULE__)}.#{level}(fn -> {"dynamically calculated #{level}", [additional: :metadata]} end)
+        :ok
 
     """
     def unquote(level)(chardata_or_fun, metadata \\ []) do
-      merge_logger_metadata_from_parent_processes()
+      set_logger_metadata_from_parent_processes()
 
       Logger.unquote(level)(chardata_or_fun, metadata)
     end
@@ -37,12 +44,17 @@ defmodule MetaLogger do
 
   ## Examples
 
-      #{inspect(__MODULE__)}.log(:info, "mission accomplished")
-      #{inspect(__MODULE__)}.log(:error, fn -> "dynamically calculated info" end)
-      #{inspect(__MODULE__)}.log(:warn, fn -> {"dynamically calculated info", [additional: :metadata]} end)
+      iex> #{inspect(__MODULE__)}.log(:info, "mission accomplished")
+      :ok
+
+      iex> #{inspect(__MODULE__)}.log(:error, fn -> "dynamically calculated info" end)
+      :ok
+
+      iex> #{inspect(__MODULE__)}.log(:warn, fn -> {"dynamically calculated info", [additional: :metadata]} end)
+      :ok
 
   """
-  @spec log(atom(), struct() | list() | chardata_or_fun(), metadata()) :: :ok
+  @spec log(atom(), payload(), metadata()) :: :ok
   def log(level, payload, metadata \\ [])
 
   def log(level, data_struct, metadata) when is_struct(data_struct) do
@@ -55,27 +67,49 @@ defmodule MetaLogger do
     do: Enum.each(logs, &log(level, &1, metadata))
 
   def log(level, chardata_or_fun, metadata) when is_atom(level) do
-    merge_logger_metadata_from_parent_processes()
+    set_logger_metadata_from_parent_processes()
 
     Logger.log(level, chardata_or_fun, metadata)
   end
 
-  @spec merge_logger_metadata_from_parent_processes() :: :ok
-  defp merge_logger_metadata_from_parent_processes do
+  @spec set_logger_metadata_from_parent_processes() :: :ok
+  defp set_logger_metadata_from_parent_processes, do: Logger.metadata(metadata())
+
+  @doc """
+  Returns the logger metadata from the current process and caller processes.
+
+  ## Examples
+
+      iex> #{inspect(__MODULE__)}.metadata()
+      []
+
+      iex> #{inspect(__MODULE__)}.metadata()
+      [metadata1: "value2", metadata2: "value2"]
+
+  """
+  @spec metadata() :: metadata()
+  def metadata do
     :"$callers"
     |> Process.get()
     |> List.wrap()
-    |> Enum.each(&get_process_logger_metadata/1)
+    |> Enum.reduce(Logger.metadata(), &merge_logger_metadata_from_parent_process/2)
   end
 
-  @spec get_process_logger_metadata(pid()) :: :ok
-  defp get_process_logger_metadata(process) do
-    process
+  @spec merge_logger_metadata_from_parent_process(pid(), metadata()) :: metadata()
+  defp merge_logger_metadata_from_parent_process(parent_pid, merged_metadata) do
+    parent_pid
+    |> get_process_logger_metadata()
+    |> Keyword.merge(merged_metadata)
+  end
+
+  @spec get_process_logger_metadata(pid()) :: metadata()
+  defp get_process_logger_metadata(pid) do
+    pid
     |> Process.info()
     |> get_in(@metadata)
     |> case do
-      nil -> :ok
-      metadata -> Logger.metadata(metadata)
+      process_metadata when is_map(process_metadata) -> Map.to_list(process_metadata)
+      nil -> []
     end
   end
 end
