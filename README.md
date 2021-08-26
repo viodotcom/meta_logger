@@ -2,7 +2,7 @@
 
 ![meta_logger](https://github.com/FindHotel/meta_logger/workflows/meta_logger/badge.svg?branch=master)
 
-Wrapper for Elixir.Logger that keeps and returns logger metadata from caller processes.
+Wrapper for Elixir `Logger` that keeps and returns the logger metadata from caller processes.
 
 ## Installation
 
@@ -31,8 +31,16 @@ Just replace `Logger` with `MetaLogger`, there's no need to require it before us
 MetaLogger.[debug|error|info|log|warn](...)
 ```
 
+For processes that can continue running after the parent process ends, the `MetaLogger` will not be
+able to get the caller processes metadata if the parent process is finished. In this case, the
+`MetaLogger.metadata/0` function can be used to store the metadata before the process starts:
+
 ```elixir
-MetaLogger.metadata()
+metadata = MetaLogger.metadata()
+
+Task.async(fn ->
+  Logger.metadata(metadata)
+end)
 ```
 
 ## Tesla Middleware
