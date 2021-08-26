@@ -1,5 +1,6 @@
 defmodule MetaLoggerTest do
   use ExUnit.Case
+
   import ExUnit.CaptureLog
 
   alias MetaLogger, as: Subject
@@ -37,7 +38,7 @@ defmodule MetaLoggerTest do
         assert logs =~ "test"
       end
 
-      test "logs a message with #{level} and no metadata when logger metadata key is set to nil" do
+      test "when logger metadata key is set to nil, logs a message with #{level} and no metadata" do
         Process.put("$logger_metadata$", nil)
 
         logs =
@@ -90,7 +91,7 @@ defmodule MetaLoggerTest do
         assert logs =~ "test"
       end
 
-      test "logs a message with #{level} and no metadata when logger metadata key is set to nil" do
+      test "when logger metadata key is set to nil, logs a message with #{level} and no metadata" do
         Process.put("$logger_metadata$", nil)
 
         logs =
@@ -114,6 +115,48 @@ defmodule MetaLoggerTest do
         assert logs =~ "test"
       end
     end)
+  end
+
+  describe "metadata/0" do
+    test "returns the logger metadata from the current process and caller processes" do
+      Logger.metadata(foo: "baz")
+
+      Task.await(
+        Task.async(fn ->
+          Logger.metadata(bar: "foo")
+
+          Task.await(
+            Task.async(fn ->
+              Logger.metadata(baz: "bar")
+
+              assert Subject.metadata() == [foo: "baz", bar: "foo", baz: "bar"]
+            end)
+          )
+        end)
+      )
+    end
+
+    test "when logger metadata key is set to nil, returns an empty list" do
+      Process.put("$logger_metadata$", nil)
+
+      Task.await(
+        Task.async(fn ->
+          Process.put("$logger_metadata$", nil)
+
+          Task.await(
+            Task.async(fn ->
+              Process.put("$logger_metadata$", nil)
+
+              assert Logger.metadata() == []
+            end)
+          )
+        end)
+      )
+    end
+
+    test "when the logger metadata is empty, returns an empty list" do
+      assert Logger.metadata() == []
+    end
   end
 
   describe "MetaLogger Formatter" do
