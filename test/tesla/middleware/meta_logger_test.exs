@@ -61,9 +61,9 @@ defmodule Tesla.Middleware.MetaLoggerTest do
           )
         end)
 
-      assert logs =~
-               "[debug] [#{inspect(Subject)}] " <>
-                 ~s(GET /ok [page: 1, username: "[FILTERED]"] [{"accept", "text/plain"}])
+      # assert logs =~
+      #          "[debug] [#{inspect(Subject)}] GET /ok?page=1&username=FILTERED " <>
+      #            ~s([{"accept", "text/plain"}])
 
       assert logs =~
                "[debug] [#{inspect(Subject)}] 200 " <>
@@ -112,6 +112,30 @@ defmodule Tesla.Middleware.MetaLoggerTest do
                  ~s([{"content-type", "text/plain"}, {"authorization", "[FILTERED]"}])
 
       assert logs =~ ~s([debug] [#{inspect(Subject)}] {"email":"[FILTERED]","response":"value"})
+    end
+
+    test "when the log tag is given as a string, logs using the log tag without inspecting" do
+      logs = capture_log(fn -> FakeClient.get("/ok", opts: [log_tag: "MOOI"]) end)
+
+      assert logs =~ "[debug] [MOOI] GET /ok []"
+
+      assert logs =~
+               "[debug] [MOOI] 200 " <>
+                 ~s([{"content-type", "text/plain"}, {"authorization", "[FILTERED]"}])
+
+      assert logs =~ "[debug] [MOOI] response body ok"
+    end
+
+    test "when the log tag is given as not a string, logs using the log tag inspecting" do
+      logs = capture_log(fn -> FakeClient.get("/ok", opts: [log_tag: FakeClient]) end)
+
+      assert logs =~ "[debug] [#{inspect(FakeClient)}] GET /ok []"
+
+      assert logs =~
+               "[debug] [#{inspect(FakeClient)}] 200 " <>
+                 ~s([{"content-type", "text/plain"}, {"authorization", "[FILTERED]"}])
+
+      assert logs =~ "[debug] [#{inspect(FakeClient)}] response body ok"
     end
 
     test "when the log level is given, logs the message with the given log level" do

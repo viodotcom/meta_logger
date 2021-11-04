@@ -34,7 +34,8 @@ if Code.ensure_loaded?(Tesla) do
     filtering will be skipped.
     * `:log_level` - The log level to be used, defaults to: `:info`. Responses with HTTP status
     code 400 and above will be logged with `:error`, and redirect with `:warn`.
-    * `:log_tag` - The log tag to be prefixed in the logs. Defaults to the current module name.
+    * `:log_tag` - The log tag to be prefixed in the logs. Any non-string value will be inspect as
+    a string. Defaults to the current module name.
     * `:max_entry_length` - The maximum length of a log entry before it is splitted into new ones.
     Defaults to `:infinity`.
 
@@ -184,7 +185,10 @@ if Code.ensure_loaded?(Tesla) do
       tag =
         options
         |> Keyword.get(:log_tag)
-        |> inspect()
+        |> case do
+          tag when is_binary(tag) -> tag
+          tag -> inspect(tag)
+        end
 
       Miss.String.build("[", tag, "] ", message)
     end
