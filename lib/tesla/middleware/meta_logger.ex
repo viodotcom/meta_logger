@@ -3,40 +3,40 @@ if Code.ensure_loaded?(Tesla) do
     @moduledoc """
     Tesla middleware to log requests and responses.
 
-    You can pass the options to the middleware or to the request `Tesla.Env`,
-    env options takes precedence over middleware options.
+    You can pass the options to the middleware or to the `Tesla.Env` request . The Tesla env
+    options take precedence over the middleware options.
 
-    ## Example usage
+    ## Usage example
 
-      defmodule MyClient do
-        use Tesla
+        defmodule MyClient do
+          use Tesla
 
-      plug #{inspect(__MODULE__)},
-        filter_body: [{~r/"email":".*?"/, ~s("email":"[FILTERED]")}],
-        filter_headers: ["authorization"],
-        filter_query_params: [:api_key],
-        log_level: :debug,
-        log_tag: MyApp,
-        max_entry_length: :infinity
-    end
+          plug #{inspect(__MODULE__)},
+            filter_body: [{~r/"email":".*?"/, ~s("email":"[FILTERED]")}],
+            filter_headers: ["authorization"],
+            filter_query_params: [:api_key],
+            log_level: :debug,
+            log_tag: MyApp,
+            max_entry_length: :infinity
+        end
 
     ## Options
 
-    * `:filter_headers` - The headers that should not be logged,
-    the values will be replaced with `[FILTERED]`, defaults to: `[]`.
-    * `:filter_query_params` - The query params that should not be logged,
-    the values will be replaced with `[FILTERED]`, defaults to: `[]`
-    * `:filter_body` - The request and response body patterns that should not be logged,
-    each filter can be just a pattern, wich will be replaced by `"[FILTERED]"`, or it
-    can be a tuple with the pattern and the replacement. Because the body filtering is
-    applied to strings it is necessary that this middleware is the last one on the stack, so
-    it receives the request body already encoded and the response body not yet decoded. If the
-    body is not a string, the filtering will be skipped.
-    * `:log_level` - The log level to be used, defaults to: `:info`. Responses with
-    HTTP status 400 and above will be logged with `:error`, and redirect with `:warn`.
-    * `:log_tag` - The log tag to be prefixed in the logs, default to: `#{inspect(__MODULE__)}`.
-    * `max_entry_length` - The maximum length of a log entry before it is splitted into new
-    ones. Defaults to `:infinity`.
+    * `:filter_headers` - The headers that should not be logged, the values will be replaced with
+    `[FILTERED]`. Defaults to: `[]`.
+    * `:filter_query_params` - The query params that should not be logged, the values will be
+    replaced with `[FILTERED]`. Defaults to: `[]`.
+    * `:filter_body` - The request and response body patterns that should not be logged, each
+    filter can be just a pattern, wich will be replaced by `"[FILTERED]"`, or it can be a tuple
+    with the pattern and the replacement. Because the body filtering is applied to strings it is
+    necessary that this middleware is the last one on the stack, so it receives the request body
+    already encoded and the response body not yet decoded. If the body is not a string, the
+    filtering will be skipped.
+    * `:log_level` - The log level to be used, defaults to: `:info`. Responses with HTTP status
+    code 400 and above will be logged with `:error`, and redirect with `:warn`.
+    * `:log_tag` - The log tag to be prefixed in the logs. Defaults to the current module name.
+    * `:max_entry_length` - The maximum length of a log entry before it is splitted into new ones.
+    Defaults to `:infinity`.
 
     """
 
@@ -52,7 +52,7 @@ if Code.ensure_loaded?(Tesla) do
     @empty_values [nil, ""]
     @filtered "[FILTERED]"
 
-    @impl Middleware
+    @impl true
     def call(%Env{opts: opts} = env, next, options) do
       options = prepare_options(options, opts)
 

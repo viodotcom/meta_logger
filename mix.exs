@@ -9,20 +9,18 @@ defmodule MetaLogger.MixProject do
       app: :meta_logger,
       consolidate_protocols: Mix.env() != :test,
       deps: deps(),
-      description: "Keep logger metadata from caller processes",
+      description: description(),
       dialyzer: dialyzer(),
       docs: docs(),
       elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
+      name: "Meta Logger",
       package: package(),
       source_url: @source_url,
       start_permanent: Mix.env() == :prod,
       version: @version
     ]
   end
-
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
 
   def application do
     [
@@ -42,6 +40,13 @@ defmodule MetaLogger.MixProject do
     ]
   end
 
+  defp description do
+    """
+    A wrapper for Elixir Logger that keeps and returns the logger metadata from the caller
+    processes.
+    """
+  end
+
   defp dialyzer do
     [
       plt_add_apps: [:miss, :tesla],
@@ -51,25 +56,24 @@ defmodule MetaLogger.MixProject do
 
   defp docs do
     [
-      extras: ["README.md", "CHANGELOG.md"],
+      canonical: "http://hexdocs.pm/meta_logger",
+      extras: ~w(README.md CHANGELOG.md),
+      formatters: ~w(html),
       main: "readme",
-      source_ref: @version
+      source_ref: @version,
+      source_url: @source_url
     ]
   end
 
+  defp elixirc_paths(:test), do: ~w(lib test/support)
+  defp elixirc_paths(_), do: ~w(lib)
+
   defp package do
     %{
-      files: ["lib", "mix.exs", "README.md", "CHANGELOG.md"],
-      licenses: ["Apache 2"],
+      files: ~w(lib mix.exs README.md CHANGELOG.md LICENSE),
+      licenses: ["Apache 2.0"],
       links: %{"GitHub" => @source_url},
-      maintainers: [
-        "Antonio Lorusso",
-        "Felipe Vieira",
-        "Fernando Hamasaki de Amorim",
-        "Sergio Rodrigues",
-        "Dmitriy Tymchuk"
-      ],
-      name: "meta_logger"
+      maintainers: ~w(OTA Tribe)
     }
   end
 end
