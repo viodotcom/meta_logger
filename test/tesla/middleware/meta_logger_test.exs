@@ -61,9 +61,9 @@ defmodule Tesla.Middleware.MetaLoggerTest do
           )
         end)
 
-      # assert logs =~
-      #          "[debug] [#{inspect(Subject)}] GET /ok?page=1&username=FILTERED " <>
-      #            ~s([{"accept", "text/plain"}])
+      assert logs =~
+               "[debug] [#{inspect(Subject)}] GET /ok?page=1&username=[FILTERED] " <>
+                 ~s([{"accept", "text/plain"}])
 
       assert logs =~
                "[debug] [#{inspect(Subject)}] 200 " <>
@@ -81,7 +81,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
         end)
 
       assert logs =~
-               ~s([debug] [#{inspect(Subject)}] POST /json [] [{"accept", "application/json"}])
+               ~s([debug] [#{inspect(Subject)}] POST /json [{"accept", "application/json"}])
 
       assert logs =~ ~s([debug] [#{inspect(Subject)}] {"email":"[FILTERED]","some":"body"})
 
@@ -103,7 +103,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
 
       assert logs =~
                "[debug] [#{inspect(Subject)}] " <>
-                 ~s(POST /json [page: 1, username: "[FILTERED]"] [{"accept", "application/json"}])
+                 ~s(POST /json?page=1&username=[FILTERED] [{"accept", "application/json"}])
 
       assert logs =~ ~s([debug] [#{inspect(Subject)}] {"email":"[FILTERED]","some":"body"})
 
@@ -117,7 +117,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
     test "when the log tag is given as a string, logs using the log tag without inspecting" do
       logs = capture_log(fn -> FakeClient.get("/ok", opts: [log_tag: "MOOI"]) end)
 
-      assert logs =~ "[debug] [MOOI] GET /ok []"
+      assert logs =~ "[debug] [MOOI] GET /ok"
 
       assert logs =~
                "[debug] [MOOI] 200 " <>
@@ -141,7 +141,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
     test "when the log level is given, logs the message with the given log level" do
       logs = capture_log(fn -> FakeClient.get("/ok", opts: [log_level: :info]) end)
 
-      assert logs =~ "[info]  [#{inspect(Subject)}] GET /ok [] []"
+      assert logs =~ "[info]  [#{inspect(Subject)}] GET /ok []"
 
       assert logs =~
                "[info]  [#{inspect(Subject)}] 200 " <>
@@ -156,7 +156,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
           FakeClient.get("/ok", opts: [filter_headers: ["authorization", "content-type"]])
         end)
 
-      assert logs =~ "[debug] [#{inspect(Subject)}] GET /ok [] []"
+      assert logs =~ "[debug] [#{inspect(Subject)}] GET /ok []"
 
       assert logs =~
                "[debug] [#{inspect(Subject)}] 200 " <>
@@ -176,7 +176,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
 
       assert logs =~
                "[debug] [#{inspect(Subject)}] " <>
-                 ~s(GET /ok [{:page, 1}, {:user, "[FILTERED]"}, {"password", "[FILTERED]"}] [])
+                 "GET /ok?page=1&user=[FILTERED]&password=[FILTERED] []"
 
       assert logs =~
                "[debug] [#{inspect(Subject)}] 200 " <>
@@ -193,7 +193,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
           )
         end)
 
-      assert logs =~ "[debug] [#{inspect(Subject)}] POST /json [] []"
+      assert logs =~ "[debug] [#{inspect(Subject)}] POST /json []"
       assert logs =~ ~s([debug] [#{inspect(Subject)}] {[FILTERED],"some":"body"})
 
       assert logs =~
@@ -215,7 +215,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
           )
         end)
 
-      assert logs =~ "[debug] [#{inspect(Subject)}] POST /huge-response [] []"
+      assert logs =~ "[debug] [#{inspect(Subject)}] POST /huge-response []"
       assert logs =~ "[debug] [#{inspect(Subject)}] #{request_body_slice1}\n"
       assert logs =~ "[debug] [#{inspect(Subject)}] #{request_body_slice2}\n"
 
@@ -230,7 +230,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
     test "when response is an error, logs the response with error log level" do
       logs = capture_log(fn -> FakeClient.get("/error") end)
 
-      assert logs =~ ~s([debug] [#{inspect(Subject)}] GET /error [] [])
+      assert logs =~ "[debug] [#{inspect(Subject)}] GET /error []"
 
       assert logs =~
                "[error] [#{inspect(Subject)}] 404 " <>
@@ -242,7 +242,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
     test "when response is a redirect, logs response with warn log level" do
       logs = capture_log(fn -> FakeClient.get("/redirect", opts: [log_level: :info]) end)
 
-      assert logs =~ ~s([info]  [#{inspect(Subject)}] GET /redirect [] [])
+      assert logs =~ "[info]  [#{inspect(Subject)}] GET /redirect []"
 
       assert logs =~
                "[warn]  [#{inspect(Subject)}] 301 " <>
@@ -254,7 +254,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
     test "when the request fails to connect, logs the error" do
       logs = capture_log(fn -> FakeClient.get("/connection-error") end)
 
-      assert logs =~ "[debug] [#{inspect(Subject)}] GET /connection-error [] []"
+      assert logs =~ "[debug] [#{inspect(Subject)}] GET /connection-error []"
       assert logs =~ "[error] [#{inspect(Subject)}] :econnrefused"
     end
   end
