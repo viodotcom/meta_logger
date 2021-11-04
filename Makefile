@@ -22,7 +22,7 @@ credo: ## Check style guide
 
 .PHONY: dialyzer
 dialyzer: ## Check types
-	@mix dialyzer --halt-exit-status
+	@mix dialyzer
 
 .PHONY: format
 format: ## Check code format
