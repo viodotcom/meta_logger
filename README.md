@@ -165,4 +165,4 @@ Copyright © 2019-2021 FindHotel
 
 [FindHotel](https://github.com/FindHotel)
 
-<a href="https://careers.findhotel.net" title="FindHotel Careers" target="_blank"><img height="150" src="https://raw.githubusercontent.com/FindHotel/meta_logger/sc-40858-format-query-string/assets/fh-loves-elixir-holo.png" alt="FindHotel loves Elxir!"></a>
+<a href="https://careers.findhotel.net" title="FindHotel Careers" target="_blank"><img height="150" src="https://raw.githubusercontent.com/FindHotel/meta_logger/master/assets/fh-loves-elixir-holo.png" alt="FindHotel loves Elxir!"></a>
