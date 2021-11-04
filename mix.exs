@@ -33,8 +33,8 @@ defmodule MetaLogger.MixProject do
   defp deps do
     [
       {:credo, "~> 1.1", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.1.0", only: [:dev], runtime: false},
+      {:ex_doc, "~> 0.25", only: :dev, runtime: false},
 
       # Middleware dependencies
       {:miss, "~> 0.1", optional: true},
