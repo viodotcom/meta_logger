@@ -55,7 +55,7 @@ following to your `mix.exs`:
 def deps do
   [
     {:tesla, "~> 1.4"},
-    {:miss, "~> 0.1"},
+    {:miss, "~> 0.1"}
   ]
 end
 ```
@@ -66,7 +66,7 @@ end
 defmodule MyClient do
   use Tesla
 
-  plug #{inspect(__MODULE__)},
+  plug Tesla.Middleware.MetaLogger,
     filter_body: {~r/email=.*&/, "email=[FILTERED]&"}
     filter_headers: ["authorization"],
     filter_query_params: [:api_key],
@@ -118,8 +118,8 @@ defmodule ClientFormatterImpl do
   end
 end
 
-# Inside the build function a logic can be defined to extract an useful payload which  needs to be
-logged, e.g. a request and response information.
+# Inside the build function a logic can be defined to extract an useful payload
+# which needs to belogged, e.g. a request and response information.
 http_request
 |> ClientFormatterImpl.build()
 |> then(fn log_struct -> MetaLogger.log(:debug, log_struct) end)

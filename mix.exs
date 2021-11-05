@@ -14,7 +14,7 @@ defmodule MetaLogger.MixProject do
       docs: docs(),
       elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
-      name: "Meta Logger",
+      name: "MetaLogger",
       package: package(),
       source_url: @source_url,
       start_permanent: Mix.env() == :prod,
