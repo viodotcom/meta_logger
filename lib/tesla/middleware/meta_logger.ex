@@ -54,8 +54,8 @@ if Code.ensure_loaded?(Tesla) do
     @filtered "[FILTERED]"
 
     @impl true
-    def call(%Env{opts: opts} = env, next, options) do
-      options = prepare_options(options, opts)
+    def call(%Env{} = env, next, options) do
+      options = prepare_options(options, env.opts)
 
       env
       |> log_request(options)
@@ -89,7 +89,7 @@ if Code.ensure_loaded?(Tesla) do
       body = build_body(env.body, options)
       level = Keyword.get(options, :log_level)
 
-      log([method, url, inspect(headers)], level, options)
+      log([method, url, headers], level, options)
       log(body, level, options)
 
       env
@@ -97,11 +97,11 @@ if Code.ensure_loaded?(Tesla) do
 
     @spec log_response(Env.result(), Env.opts()) :: Env.result()
     defp log_response({:ok, %Env{} = env} = result, options) do
-      level = response_log_level(result, options)
       headers = build_headers(env.headers, options)
       body = build_body(env.body, options)
+      level = response_log_level(result, options)
 
-      log([env.status, inspect(headers)], level, options)
+      log([env.status, headers], level, options)
       log(body, level, options)
 
       result
@@ -109,14 +109,18 @@ if Code.ensure_loaded?(Tesla) do
 
     defp log_response({:error, reason} = result, options) do
       level = response_log_level(result, options)
+
       log(reason, level, options)
 
       result
     end
 
-    @spec build_headers(Env.headers(), Env.opts()) :: Env.headers()
-    defp build_headers(headers, options),
-      do: Enum.map(headers, &filter_keyword(&1, Keyword.get(options, :filter_headers)))
+    @spec build_headers(Env.headers(), Env.opts()) :: String.t()
+    defp build_headers(headers, options) do
+      headers
+      |> Enum.map(&filter_keyword(&1, Keyword.get(options, :filter_headers)))
+      |> inspect()
+    end
 
     @spec build_url(Env.url(), Env.query(), Env.opts()) :: String.t()
     defp build_url(url, query, options) do
@@ -126,15 +130,15 @@ if Code.ensure_loaded?(Tesla) do
         |> URI.encode_query()
         |> URI.decode()
 
-      unless encoded_query == "" do
-        Miss.String.build(url, "?", encoded_query)
-      else
+      if encoded_query == "" do
         url
+      else
+        Miss.String.build(url, "?", encoded_query)
       end
     end
 
-    @spec filter_keyword(Env.headers() | Env.query(), [atom() | String.t()]) ::
-            Env.headers() | Env.query()
+    @spec filter_keyword({atom() | String.t(), String.t()}, [atom()] | [String.t()]) ::
+            {atom() | String.t(), String.t()}
     defp filter_keyword({key, _value} = item, filters),
       do: if(key in filters, do: {key, @filtered}, else: item)
 
