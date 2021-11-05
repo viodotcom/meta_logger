@@ -78,21 +78,9 @@ end
 
 ### Options
 
-* `:filter_headers` - The headers that should not be logged, the values will be replaced with
-`[FILTERED]`. Defaults to: `[]`.
-* `:filter_query_params` - The query params that should not be logged, the values will be
-replaced with `[FILTERED]`. Defaults to: `[]`.
-* `:filter_body` - The request and response body patterns that should not be logged, each
-filter can be just a pattern, wich will be replaced by `"[FILTERED]"`, or it can be a tuple
-with the pattern and the replacement. Because the body filtering is applied to strings it is
-necessary that this middleware is the last one on the stack, so it receives the request body
-already encoded and the response body not yet decoded. If the body is not a string, the
-filtering will be skipped.
-* `:log_level` - The log level to be used, defaults to: `:info`. Responses with HTTP status
-code 400 and above will be logged with `:error`, and redirect with `:warn`.
-* `:log_tag` - The log tag to be prefixed in the logs. Defaults to the current module name.
-* `:max_entry_length` - The maximum length of a log entry before it is splitted into new ones.
-Defaults to `:infinity`.
+See the [`Tesla.Middleware.MetaLogger`](https://hexdocs.pm/meta_logger/Tesla.Middleware.MetaLogger.html)
+documentation for the options definition.
+
 
 ## MetaLogger.Formatter protocol
 

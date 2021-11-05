@@ -13,6 +13,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Update documentation.
 - Rename GitHub Action workflow.
 
+### Fixed
+- Format query string in Tesla Middleware logs.
+[Issue #13](https://github.com/FindHotel/meta_logger/issues/13)
+
 ## [1.5.0] - 2021-08-26
 ### Added
 - Add `MetaLogger.metadata/0` function to return the logger metadata from the current process and

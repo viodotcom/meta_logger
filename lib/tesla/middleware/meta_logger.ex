@@ -34,7 +34,8 @@ if Code.ensure_loaded?(Tesla) do
     filtering will be skipped.
     * `:log_level` - The log level to be used, defaults to: `:info`. Responses with HTTP status
     code 400 and above will be logged with `:error`, and redirect with `:warn`.
-    * `:log_tag` - The log tag to be prefixed in the logs. Defaults to the current module name.
+    * `:log_tag` - The log tag to be prefixed in the logs. Any non-string value will be inspect as
+    a string. Defaults to the current module name.
     * `:max_entry_length` - The maximum length of a log entry before it is splitted into new ones.
     Defaults to `:infinity`.
 
@@ -53,8 +54,8 @@ if Code.ensure_loaded?(Tesla) do
     @filtered "[FILTERED]"
 
     @impl true
-    def call(%Env{opts: opts} = env, next, options) do
-      options = prepare_options(options, opts)
+    def call(%Env{} = env, next, options) do
+      options = prepare_options(options, env.opts)
 
       env
       |> log_request(options)
@@ -81,25 +82,26 @@ if Code.ensure_loaded?(Tesla) do
       do: Keyword.put(options, key, Keyword.get(options, key, default_value))
 
     @spec log_request(Env.t(), Env.opts()) :: Env.t()
-    defp log_request(%Env{body: body, method: method, query: query, url: url} = env, options) do
+    defp log_request(%Env{} = env, options) do
+      method = format_method(env.method)
+      url = build_url(env.url, env.query, options)
+      headers = build_headers(env.headers, options)
+      body = build_body(env.body, options)
       level = Keyword.get(options, :log_level)
-      headers = build_headers(env, options)
-      query = build_query(query, options)
-      body = build_body(body, options)
 
-      log([format_method(method), url, inspect(query), inspect(headers)], level, options)
+      log([method, url, headers], level, options)
       log(body, level, options)
 
       env
     end
 
     @spec log_response(Env.result(), Env.opts()) :: Env.result()
-    defp log_response({:ok, %Env{body: body, status: status} = env} = result, options) do
+    defp log_response({:ok, %Env{} = env} = result, options) do
+      headers = build_headers(env.headers, options)
+      body = build_body(env.body, options)
       level = response_log_level(result, options)
-      headers = build_headers(env, options)
-      body = build_body(body, options)
 
-      log([status, inspect(headers)], level, options)
+      log([env.status, headers], level, options)
       log(body, level, options)
 
       result
@@ -107,31 +109,38 @@ if Code.ensure_loaded?(Tesla) do
 
     defp log_response({:error, reason} = result, options) do
       level = response_log_level(result, options)
+
       log(reason, level, options)
 
       result
     end
 
-    @spec build_headers(Env.t(), Env.opts()) :: Env.headers()
-    defp build_headers(%Env{headers: headers}, options) do
-      filter_headers = Keyword.get(options, :filter_headers)
-      Enum.map(headers, &filter_header(&1, filter_headers))
+    @spec build_headers(Env.headers(), Env.opts()) :: String.t()
+    defp build_headers(headers, options) do
+      headers
+      |> Enum.map(&filter_keyword(&1, Keyword.get(options, :filter_headers)))
+      |> inspect()
     end
 
-    @spec filter_header({String.t(), String.t()}, [String.t()]) :: {String.t(), String.t()}
-    defp filter_header({key, _value} = header, filter_headers),
-      do: if(key in filter_headers, do: {key, @filtered}, else: header)
+    @spec build_url(Env.url(), Env.query(), Env.opts()) :: String.t()
+    defp build_url(url, query, options) do
+      encoded_query =
+        query
+        |> Enum.map(&filter_keyword(&1, Keyword.get(options, :filter_query_params)))
+        |> URI.encode_query()
+        |> URI.decode()
 
-    @spec build_query(Env.query(), Env.opts()) :: Env.query()
-    defp build_query(query, options) do
-      filter_query_params = Keyword.get(options, :filter_query_params)
-      Enum.map(query, &filter_query_params(&1, filter_query_params))
+      if encoded_query == "" do
+        url
+      else
+        Miss.String.build(url, "?", encoded_query)
+      end
     end
 
-    @spec filter_query_params({String.t() | atom(), String.t()}, [atom() | String.t()]) ::
+    @spec filter_keyword({atom() | String.t(), String.t()}, [atom()] | [String.t()]) ::
             {atom() | String.t(), String.t()}
-    defp filter_query_params({key, _value} = param, filter_query_params),
-      do: if(key in filter_query_params, do: {key, @filtered}, else: param)
+    defp filter_keyword({key, _value} = item, filters),
+      do: if(key in filters, do: {key, @filtered}, else: item)
 
     @spec build_body(Env.body(), Env.opts()) :: Env.body()
     defp build_body(body, options) when is_binary(body) do
@@ -184,7 +193,10 @@ if Code.ensure_loaded?(Tesla) do
       tag =
         options
         |> Keyword.get(:log_tag)
-        |> inspect()
+        |> case do
+          tag when is_binary(tag) -> tag
+          tag -> inspect(tag)
+        end
 
       Miss.String.build("[", tag, "] ", message)
     end
