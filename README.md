@@ -15,7 +15,7 @@ The package can be installed by adding `meta_logger` to your list of dependencie
 ```elixir
 def deps do
   [
-    {:meta_logger, "~> 1.6.0"}
+    {:meta_logger, "~> 1.6.1"}
   ]
 end
 ```
