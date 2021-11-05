@@ -5,7 +5,7 @@ defprotocol MetaLogger.Formatter do
 
   @fallback_to_any true
 
-  @spec format(struct()) :: String.t() | list()
+  @spec format(struct()) :: no_return()
   def format(payload)
 
   defmodule IncorrectPayload do

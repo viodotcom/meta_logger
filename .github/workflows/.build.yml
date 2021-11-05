@@ -1,4 +1,4 @@
-name: meta_logger
+name: build
 
 on:
   push:
