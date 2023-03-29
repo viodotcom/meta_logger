@@ -36,7 +36,7 @@ defmodule MetaLogger.MixProject do
 
       # Middleware dependencies
       {:miss, "~> 0.1", optional: true},
-      {:tesla, "~> 1.4", optional: true}
+      {:tesla, "~> 1.5.1", optional: true}
     ]
   end
 
