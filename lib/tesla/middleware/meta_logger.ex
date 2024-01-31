@@ -33,7 +33,7 @@ if Code.ensure_loaded?(Tesla) do
     already encoded and the response body not yet decoded. If the body is not a string, the
     filtering will be skipped.
     * `:log_level` - The log level to be used, defaults to: `:info`. Responses with HTTP status
-    code 400 and above will be logged with `:error`, and redirect with `:warn`.
+    code 400 and above will be logged with `:error`, and redirect with `:warning`.
     * `:log_tag` - The log tag to be prefixed in the logs. Any non-string value will be inspect as
     a string. Defaults to the current module name.
     * `:max_entry_length` - The maximum length of a log entry before it is splitted into new ones.
@@ -158,7 +158,10 @@ if Code.ensure_loaded?(Tesla) do
     @spec response_log_level(Env.result(), Env.opts()) :: Logger.level()
     defp response_log_level({:error, _any}, _options), do: :error
     defp response_log_level({:ok, %Env{status: status}}, _options) when status >= 400, do: :error
-    defp response_log_level({:ok, %Env{status: status}}, _options) when status >= 300, do: :warn
+
+    defp response_log_level({:ok, %Env{status: status}}, _options) when status >= 300,
+      do: :warning
+
     defp response_log_level(_result, options), do: Keyword.get(options, :log_level)
 
     @spec format_method(atom()) :: String.t()

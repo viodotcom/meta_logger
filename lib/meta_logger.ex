@@ -11,7 +11,7 @@ defmodule MetaLogger do
   @type metadata :: keyword()
   @type payload :: struct() | list() | chardata_or_fun()
 
-  Enum.each(~w(debug error info warn)a, fn level ->
+  Enum.each(~w(debug error info warning)a, fn level ->
     @doc """
     Logs a #{level} message keeping logger metadata from caller processes.
     Returns `:ok` or an `{:error, reason}` tuple.
@@ -24,16 +24,43 @@ defmodule MetaLogger do
         iex> #{inspect(__MODULE__)}.#{level}(fn -> "dynamically calculated debug" end)
         :ok
 
-        iex> #{inspect(__MODULE__)}.#{level}(fn -> {"dynamically calculated #{level}", [additional: :metadata]} end)
+        iex> #{inspect(__MODULE__)}.#{level}(fn ->
+        ...>   {"dynamically calculated #{level}", [additional: :metadata]}
+        ...> end)
         :ok
 
     """
+    @spec unquote(level)(chardata_or_fun()) :: :ok
+    @spec unquote(level)(chardata_or_fun(), metadata()) :: :ok
     def unquote(level)(chardata_or_fun, metadata \\ []) do
       set_logger_metadata_from_parent_processes()
 
       Logger.unquote(level)(chardata_or_fun, metadata)
     end
   end)
+
+  @doc """
+  Logs a warning message keeping logger metadata from caller processes.
+  Returns `:ok` or an `{:error, reason}` tuple.
+
+  ## Examples
+
+      iex> #{inspect(__MODULE__)}.warn("hello?")
+      :ok
+
+      iex> #{inspect(__MODULE__)}.warn(fn -> "dynamically calculated debug" end)
+      :ok
+
+      iex> #{inspect(__MODULE__)}.warn(fn ->
+      ...>   {"dynamically calculated warning", [additional: :metadata]}
+      ...> end)
+      :ok
+
+  """
+  @deprecated "Use MetaLogger.warning/2 instead."
+  @spec warn(chardata_or_fun()) :: :ok
+  @spec warn(chardata_or_fun(), metadata()) :: :ok
+  def warn(chardata_or_fun, metadata \\ []), do: warning(chardata_or_fun, metadata)
 
   @doc """
   Logs a message with given `level` keeping logger metadata from caller processes.
@@ -50,10 +77,13 @@ defmodule MetaLogger do
       iex> #{inspect(__MODULE__)}.log(:error, fn -> "dynamically calculated info" end)
       :ok
 
-      iex> #{inspect(__MODULE__)}.log(:warn, fn -> {"dynamically calculated info", [additional: :metadata]} end)
+      iex> #{inspect(__MODULE__)}.log(:warning, fn ->
+      ...>   {"dynamically calculated info", [additional: :metadata]}
+      ...> end)
       :ok
 
   """
+  @spec log(atom(), payload()) :: :ok
   @spec log(atom(), payload(), metadata()) :: :ok
   def log(level, payload, metadata \\ [])
 

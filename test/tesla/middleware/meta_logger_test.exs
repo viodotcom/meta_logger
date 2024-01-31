@@ -141,13 +141,13 @@ defmodule Tesla.Middleware.MetaLoggerTest do
     test "when the log level is given, logs the message with the given log level" do
       logs = capture_log(fn -> FakeClient.get("/ok", opts: [log_level: :info]) end)
 
-      assert logs =~ "[info]  [#{inspect(Subject)}] GET /ok []"
+      assert logs =~ "[info] [#{inspect(Subject)}] GET /ok []"
 
       assert logs =~
-               "[info]  [#{inspect(Subject)}] 200 " <>
+               "[info] [#{inspect(Subject)}] 200 " <>
                  ~s([{"content-type", "text/plain"}, {"authorization", "[FILTERED]"}])
 
-      assert logs =~ "[info]  [#{inspect(Subject)}] response body ok"
+      assert logs =~ "[info] [#{inspect(Subject)}] response body ok"
     end
 
     test "when a filtered header is given, logs the message filtering the given headers" do
@@ -239,16 +239,16 @@ defmodule Tesla.Middleware.MetaLoggerTest do
       assert logs =~ "[error] [#{inspect(Subject)}] response body error"
     end
 
-    test "when response is a redirect, logs response with warn log level" do
+    test "when response is a redirect, logs response with warning log level" do
       logs = capture_log(fn -> FakeClient.get("/redirect", opts: [log_level: :info]) end)
 
-      assert logs =~ "[info]  [#{inspect(Subject)}] GET /redirect []"
+      assert logs =~ "[info] [#{inspect(Subject)}] GET /redirect []"
 
       assert logs =~
-               "[warn]  [#{inspect(Subject)}] 301 " <>
+               "[warning] [#{inspect(Subject)}] 301 " <>
                  ~s([{"content-type", "text/plain"}, {"authorization", "[FILTERED]"}])
 
-      assert logs =~ "[warn]  [#{inspect(Subject)}] response body moved"
+      assert logs =~ "[warning] [#{inspect(Subject)}] response body moved"
     end
 
     test "when the request fails to connect, logs the error" do
