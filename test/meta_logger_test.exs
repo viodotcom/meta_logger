@@ -28,7 +28,7 @@ defmodule MetaLoggerTest do
             )
           end)
 
-        assert logs =~ "foo=foo bar=bar baz=baz [#{unquote(level)}] test"
+        assert logs =~ "bar=bar baz=baz foo=foo [#{unquote(level)}] test"
       end
 
       test "when logger metadata key is set to nil, logs a message with #{level} and no metadata" do
@@ -77,7 +77,7 @@ defmodule MetaLoggerTest do
           )
         end)
 
-      assert logs =~ "foo=foo bar=bar baz=baz [warning] test"
+      assert logs =~ "bar=bar baz=baz foo=foo [warning] test"
     end
 
     test "when logger metadata key is set to nil, logs a message with warning and no metadata" do
