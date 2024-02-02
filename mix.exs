@@ -31,7 +31,7 @@ defmodule MetaLogger.MixProject do
   defp deps do
     [
       {:credo, "~> 1.1", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.1.0", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.25", only: :dev, runtime: false},
 
       # Middleware dependencies
@@ -73,7 +73,7 @@ defmodule MetaLogger.MixProject do
       files: ~w(lib mix.exs README.md CHANGELOG.md LICENSE),
       licenses: ["Apache 2.0"],
       links: %{"GitHub" => @source_url},
-      maintainers: ~w(OTA Tribe)
+      maintainers: ~w(Vio.com)
     }
   end
 end
