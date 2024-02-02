@@ -45,6 +45,7 @@ jobs:
           mix local.hex --force
           mix deps.get
           mix deps.compile
+          MIX_ENV=dev mix deps.compile
           MIX_ENV=test mix deps.compile
           mix dialyzer --plt
 
