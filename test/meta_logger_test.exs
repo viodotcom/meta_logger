@@ -128,7 +128,7 @@ defmodule MetaLoggerTest do
             )
           end)
 
-        assert logs =~ "foo=baz bar=foo baz=bar [#{unquote(level)}]"
+        assert logs =~ "bar=foo baz=bar foo=baz [#{unquote(level)}]"
         assert logs =~ "test"
       end
 
