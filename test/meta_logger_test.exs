@@ -5,13 +5,7 @@ defmodule MetaLoggerTest do
 
   alias MetaLogger, as: Subject
 
-  setup do
-    Logger.configure_backend(:console, metadata: [:foo, :bar, :baz])
-
-    on_exit(fn -> Logger.configure_backend(:console, metadata: []) end)
-  end
-
-  ~w(debug error info warn)a
+  ~w(debug error info warning)a
   |> Enum.each(fn level ->
     describe "#{level}/2" do
       test "logs a message with #{level} level and metadata from current and caller processes" do
@@ -34,8 +28,7 @@ defmodule MetaLoggerTest do
             )
           end)
 
-        assert logs =~ "foo=foo bar=bar baz=baz [#{unquote(level)}]"
-        assert logs =~ "test"
+        assert logs =~ "bar=bar baz=baz foo=foo [#{unquote(level)}] test"
       end
 
       test "when logger metadata key is set to nil, logs a message with #{level} and no metadata" do
@@ -64,8 +57,56 @@ defmodule MetaLoggerTest do
     end
   end)
 
+  describe "warn/2" do
+    test "logs a message with warning level and metadata from current and caller processes" do
+      Logger.metadata(foo: "foo")
+
+      logs =
+        capture_log(fn ->
+          Task.await(
+            Task.async(fn ->
+              Logger.metadata(bar: "bar")
+
+              Task.await(
+                Task.async(fn ->
+                  Logger.metadata(baz: "baz")
+                  Subject.warn("test")
+                end)
+              )
+            end)
+          )
+        end)
+
+      assert logs =~ "bar=bar baz=baz foo=foo [warning] test"
+    end
+
+    test "when logger metadata key is set to nil, logs a message with warning and no metadata" do
+      Process.put("$logger_metadata$", nil)
+
+      logs =
+        capture_log(fn ->
+          Task.await(
+            Task.async(fn ->
+              Process.put("$logger_metadata$", nil)
+
+              Task.await(
+                Task.async(fn ->
+                  Process.put("$logger_metadata$", nil)
+
+                  Subject.warn("test")
+                end)
+              )
+            end)
+          )
+        end)
+
+      assert logs =~ "[warning]"
+      assert logs =~ "test"
+    end
+  end
+
   describe "log/3" do
-    ~w(debug error info warn)a
+    ~w(debug error info warning)a
     |> Enum.each(fn level ->
       test "logs a message with #{level} level and metadata from current and caller processes" do
         Logger.metadata(foo: "baz")
@@ -87,7 +128,7 @@ defmodule MetaLoggerTest do
             )
           end)
 
-        assert logs =~ "foo=baz bar=foo baz=bar [#{unquote(level)}]"
+        assert logs =~ "bar=foo baz=bar foo=baz [#{unquote(level)}]"
         assert logs =~ "test"
       end
 

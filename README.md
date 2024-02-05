@@ -27,7 +27,7 @@ MetaLogger requires Elixir 1.10 or greater. For previous Elixir versions use Met
 Just replace `Logger` with `MetaLogger`, there is no need to require it before using:
 
 ```elixir
-MetaLogger.[debug|error|info|log|warn](...)
+MetaLogger.[debug|error|info|log|warning](...)
 ```
 
 For processes that can continue running after the parent process ends, the `MetaLogger` will not
@@ -81,7 +81,6 @@ end
 See the [`Tesla.Middleware.MetaLogger`](https://hexdocs.pm/meta_logger/Tesla.Middleware.MetaLogger.html)
 documentation for the options definition.
 
-
 ## MetaLogger.Formatter protocol
 
 It is possible to define an implementation for a custom struct, so MetaLogger will know how to
@@ -127,12 +126,12 @@ http_request
 
 ### Options
 
-* `:formatter_fn` (required) - The function which is used to format a given payload. The function
-must return a string or a list of strings.
-* `:filter_patterns` (optional) - Regex patterns which will be used to replace sensitive
-information in a payload. It is a list of strings or tuples (can be mixed). If tuples are given,
-the first element is used as a regex pattern to match, and the second is as a replacement which
-will be used to replace it. E.g. `{~s/"name": ".+"/, ~s/"name": "[FILTERED]"/}`.
+- `:formatter_fn` (required) - The function which is used to format a given payload. The function
+  must return a string or a list of strings.
+- `:filter_patterns` (optional) - Regex patterns which will be used to replace sensitive
+  information in a payload. It is a list of strings or tuples (can be mixed). If tuples are given,
+  the first element is used as a regex pattern to match, and the second is as a replacement which
+  will be used to replace it. E.g. `{~s/"name": ".+"/, ~s/"name": "[FILTERED]"/}`.
 
 ## Full documentation
 
