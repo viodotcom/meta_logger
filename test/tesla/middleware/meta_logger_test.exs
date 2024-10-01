@@ -230,7 +230,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
     end
 
     test "when the max entry length is given and the logs are split, the metadata is captured with each line" do
-      Logger.metadata(request_id: "123123123")
+      Logger.metadata(foo: "123123123")
 
       body = String.duplicate("x", 100)
 
@@ -242,7 +242,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
 
       log_lines
       |> Enum.each(fn log_line ->
-        assert log_line =~ "request_id=123123123"
+        assert log_line =~ "foo=123123123"
       end)
     end
 
