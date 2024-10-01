@@ -229,7 +229,11 @@ defmodule Tesla.Middleware.MetaLoggerTest do
       assert logs =~ "[debug] [#{inspect(Subject)}] #{String.duplicate("b", 100)}\n"
     end
 
-    test "when the max entry length is given and the logs are split, the metadata is captured with each line" do
+    test """
+    For POST requests \
+    when the max entry length is given and the logs are split \
+    the metadata is captured with each line
+    """ do
       Logger.metadata(foo: "123123123")
 
       body = String.duplicate("x", 100)
@@ -237,6 +241,25 @@ defmodule Tesla.Middleware.MetaLoggerTest do
       log_lines =
         capture_log(fn ->
           FakeClient.post("/huge-response", body, opts: [max_entry_length: 10])
+        end)
+        |> String.split("\n\n")
+
+      log_lines
+      |> Enum.each(fn log_line ->
+        assert log_line =~ "foo=123123123"
+      end)
+    end
+
+    test """
+    For GET requests \
+    when the max entry length is given and the logs are split \
+    the metadata is captured with each line
+    """ do
+      Logger.metadata(foo: "123123123")
+
+      log_lines =
+        capture_log(fn ->
+          FakeClient.get("/huge-response", opts: [max_entry_length: 10])
         end)
         |> String.split("\n\n")
 
