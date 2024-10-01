@@ -1,5 +1,5 @@
 defmodule Tesla.Middleware.MetaLoggerTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   require Logger
 
