@@ -1,7 +1,7 @@
 defmodule MetaLogger.SlicerTest do
   use ExUnit.Case, async: true
 
-  alias MetaLogger.Slicer, as: Subject
+  alias MetaLogger.Slicer.Default, as: Subject
 
   doctest Subject
 

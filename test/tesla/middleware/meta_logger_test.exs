@@ -5,6 +5,15 @@ defmodule Tesla.Middleware.MetaLoggerTest do
 
   alias Tesla.Middleware.MetaLogger, as: Subject
 
+  defmodule AlternativeSlicer do
+    @behaviour MetaLogger.Slicer
+
+    @impl MetaLogger.Slicer
+    def slice(entry, _max_entry_length) do
+      ["slice1", "slice2"]
+    end
+  end
+
   defmodule FakeClient do
     use Tesla
 
@@ -249,6 +258,18 @@ defmodule Tesla.Middleware.MetaLoggerTest do
                  ~s([{"content-type", "text/plain"}, {"authorization", "[FILTERED]"}])
 
       assert logs =~ "[warning] [#{inspect(Subject)}] response body moved"
+    end
+
+    test "when a slicer module is given, uses it to slice the message" do
+      logs =
+        capture_log(fn ->
+          FakeClient.post("/huge-response", "1234567890",
+            opts: [slicer: __MODULE__.AlternativeSlicer]
+          )
+        end)
+
+      assert logs =~ "[debug] [Tesla.Middleware.MetaLogger] slice1"
+      assert logs =~ "[debug] [Tesla.Middleware.MetaLogger] slice2"
     end
 
     test "when the request fails to connect, logs the error" do

@@ -71,6 +71,7 @@ if Code.ensure_loaded?(Tesla) do
       |> maybe_put_default_value(:log_level, :info)
       |> maybe_put_default_value(:log_tag, __MODULE__)
       |> maybe_put_default_value(:max_entry_length, :infinity)
+      |> maybe_put_default_value(:slicer, MetaLogger.Slicer.Default)
     end
 
     @spec maybe_put_default_values(Env.opts(), [atom()], any()) :: Env.opts()
@@ -182,9 +183,10 @@ if Code.ensure_loaded?(Tesla) do
 
     defp log(message, level, options) when is_binary(message) do
       max_entry_length = Keyword.get(options, :max_entry_length)
+      slicer = Keyword.get(options, :slicer)
 
       message
-      |> Slicer.slice(max_entry_length)
+      |> slicer.slice(max_entry_length)
       |> Enum.map(&prepend_tag(&1, options))
       |> Enum.each(&MetaLogger.log(level, &1))
     end
