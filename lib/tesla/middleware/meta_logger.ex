@@ -71,7 +71,7 @@ if Code.ensure_loaded?(Tesla) do
       |> maybe_put_default_value(:log_level, :info)
       |> maybe_put_default_value(:log_tag, __MODULE__)
       |> maybe_put_default_value(:max_entry_length, :infinity)
-      |> maybe_put_default_value(:slicer, MetaLogger.Slicer.Default)
+      |> maybe_put_default_value(:slicer, MetaLogger.Slicer.DefaultImpl)
     end
 
     @spec maybe_put_default_values(Env.opts(), [atom()], any()) :: Env.opts()

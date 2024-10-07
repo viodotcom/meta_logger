@@ -1,13 +1,17 @@
 defmodule MetaLogger.Slicer do
   @moduledoc """
-  Responsible for slicing log entries according to the given max length option.
+  A bebaviour for slicing long entries into a list of entries shorter than a passed `max_entry_length` value.
   """
 
   @typedoc "Max length in bytes or `:infinity` if the entry should not be sliced."
   @type max_entry_length :: non_neg_integer() | :infinity
   @callback slice(String.t(), max_entry_length()) :: [String.t()]
 
-  defmodule Default do
+  defmodule DefaultImpl do
+    @moduledoc """
+    Responsible for slicing log entries according to the given max length option.
+    """
+
     @behaviour MetaLogger.Slicer
     @doc """
     Returns sliced log entries according to the given max entry length.

@@ -9,7 +9,7 @@ defmodule Tesla.Middleware.MetaLoggerTest do
     @behaviour MetaLogger.Slicer
 
     @impl MetaLogger.Slicer
-    def slice(entry, _max_entry_length) do
+    def slice(_entry, _max_entry_length) do
       ["slice1", "slice2"]
     end
   end
