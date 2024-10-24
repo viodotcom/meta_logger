@@ -3,7 +3,7 @@ if Code.ensure_loaded?(Tesla) do
     @moduledoc """
     Tesla middleware to log requests and responses.
 
-    You can pass the options to the middleware or to the `Tesla.Env` request . The Tesla env
+    You can pass the options to the middleware or to the `Tesla.Env` request. The Tesla env
     options take precedence over the middleware options.
 
     ## Usage example
@@ -17,7 +17,8 @@ if Code.ensure_loaded?(Tesla) do
             filter_query_params: [:api_key],
             log_level: :debug,
             log_tag: MyApp,
-            max_entry_length: :infinity
+            max_entry_length: :infinity,
+            slicer: MyCustomSlicer
         end
 
     ## Options
@@ -27,17 +28,19 @@ if Code.ensure_loaded?(Tesla) do
     * `:filter_query_params` - The query params that should not be logged, the values will be
     replaced with `[FILTERED]`. Defaults to: `[]`.
     * `:filter_body` - The request and response body patterns that should not be logged, each
-    filter can be just a pattern, wich will be replaced by `"[FILTERED]"`, or it can be a tuple
+    filter can be just a pattern, which will be replaced by `"[FILTERED]"`, or it can be a tuple
     with the pattern and the replacement. Because the body filtering is applied to strings it is
     necessary that this middleware is the last one on the stack, so it receives the request body
     already encoded and the response body not yet decoded. If the body is not a string, the
     filtering will be skipped.
     * `:log_level` - The log level to be used, defaults to: `:info`. Responses with HTTP status
     code 400 and above will be logged with `:error`, and redirect with `:warning`.
-    * `:log_tag` - The log tag to be prefixed in the logs. Any non-string value will be inspect as
+    * `:log_tag` - The log tag to be prefixed in the logs. Any non-string value will be inspected as
     a string. Defaults to the current module name.
-    * `:max_entry_length` - The maximum length of a log entry before it is splitted into new ones.
+    * `:max_entry_length` - The maximum length of a log entry before it is split into new ones.
     Defaults to `:infinity`.
+    * `:slicer` - The module implementing the `MetaLogger.Slicer` behaviour to be used for slicing
+    log entries. Defaults to `MetaLogger.Slicer.DefaultImpl`.
 
     """
 
@@ -71,7 +74,7 @@ if Code.ensure_loaded?(Tesla) do
       |> maybe_put_default_value(:log_level, :info)
       |> maybe_put_default_value(:log_tag, __MODULE__)
       |> maybe_put_default_value(:max_entry_length, :infinity)
-      |> maybe_put_default_value(:slicer, MetaLogger.Slicer.DefaultImpl)
+      |> maybe_put_default_value(:slicer, Slicer.DefaultImpl)
     end
 
     @spec maybe_put_default_values(Env.opts(), [atom()], any()) :: Env.opts()
@@ -80,7 +83,7 @@ if Code.ensure_loaded?(Tesla) do
 
     @spec maybe_put_default_value(Env.opts(), atom(), any()) :: Env.opts()
     defp maybe_put_default_value(options, key, default_value),
-      do: Keyword.put(options, key, Keyword.get(options, key, default_value))
+      do: Keyword.put_new(options, key, default_value)
 
     @spec log_request(Env.t(), Env.opts()) :: Env.t()
     defp log_request(%Env{} = env, options) do
