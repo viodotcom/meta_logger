@@ -5,9 +5,6 @@ defmodule MetaLogger.Slicer.Utf8Impl do
 
   @behaviour MetaLogger.Slicer
 
-  @typedoc "Max length in bytes or `:infinity` if the entry should not be sliced."
-  @type max_entry_length :: non_neg_integer() | :infinity
-
   @doc """
   Returns sliced log entries according to the given max entry length.
 
@@ -31,7 +28,7 @@ defmodule MetaLogger.Slicer.Utf8Impl do
       ["Hello ", "世界"]
   """
   @impl MetaLogger.Slicer
-  @spec slice(String.t(), integer()) :: [String.t()]
+  @spec slice(binary(), MetaLogger.Slicer.max_entry_length()) :: [String.t()]
   def slice(log_entry, :infinity), do: [log_entry]
 
   def slice(entry, max_entry_length) when byte_size(entry) <= max_entry_length,
@@ -41,7 +38,7 @@ defmodule MetaLogger.Slicer.Utf8Impl do
     do_slice(entry, max_entry_length, [], [], 0)
   end
 
-  @spec do_slice(binary(), integer(), [binary()], [iodata()], integer()) :: [binary()]
+  @spec do_slice(binary(), integer(), [binary()], [iodata()], integer()) :: [String.t()]
   defp do_slice(<<>>, _max_length, slices, partial_slice, _partial_size) do
     # The remaining log entry is empty so we clean up the last partial_slice
     # and return the slices.

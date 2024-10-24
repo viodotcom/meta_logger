@@ -5,5 +5,5 @@ defmodule MetaLogger.Slicer do
 
   @typedoc "Max length in bytes or `:infinity` if the entry should not be sliced."
   @type max_entry_length :: non_neg_integer() | :infinity
-  @callback slice(String.t(), max_entry_length()) :: [String.t()]
+  @callback slice(binary(), max_entry_length()) :: [binary()]
 end

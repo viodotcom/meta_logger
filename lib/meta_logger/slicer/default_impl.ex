@@ -24,6 +24,7 @@ defmodule MetaLogger.Slicer.DefaultImpl do
 
   """
   @impl MetaLogger.Slicer
+  @spec slice(binary(), MetaLogger.Slicer.max_entry_length()) :: [binary()]
   def slice(entry, max_entry_length)
       when max_entry_length == :infinity
       when byte_size(entry) <= max_entry_length,
