@@ -1,7 +1,7 @@
-defmodule MetaLogger.SlicerTest do
+defmodule MetaLogger.Utf8SlicerTest do
   use ExUnit.Case, async: true
 
-  alias MetaLogger.Slicer.DefaultImpl, as: Subject
+  alias MetaLogger.Slicer.Utf8Impl, as: Subject
 
   doctest Subject
 
@@ -47,14 +47,12 @@ defmodule MetaLogger.SlicerTest do
       assert Subject.slice(entry, :pqp) == [entry]
     end
 
-    test "when slicing a UTF-8 string not all slices will be valid UTF-8 strings" do
-      range_of_slices =
-        7..1
-        |> Enum.flat_map(fn max_length ->
-          Subject.slice("Hello 世界", max_length)
-        end)
-
-      refute Enum.all?(range_of_slices, &String.valid?/1)
+    test "when slicing a UTF-8 string all slices will be valid UTF-8 strings" do
+      7..1
+      |> Enum.each(fn max_length ->
+        assert log_entries = Subject.slice("Hello 世界", max_length)
+        assert Enum.all?(log_entries, &String.valid?/1)
+      end)
     end
   end
 end
