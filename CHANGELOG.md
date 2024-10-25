@@ -7,6 +7,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Add `Tesla.Middleware.MetaLogger` configuration option `:slicer`.
+- Add `MetaLogger.Slicer` protocol and `MetaLogger.Slicer.Utf8Impl` as a UTF-8 aware implementation.
+
 ## [1.7.0] - 2024-02-05
 
 ### Added
