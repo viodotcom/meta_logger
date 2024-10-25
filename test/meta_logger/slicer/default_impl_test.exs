@@ -1,4 +1,4 @@
-defmodule MetaLogger.SlicerTest do
+defmodule MetaLogger.Slicer.DefaultImplTest do
   use ExUnit.Case, async: true
 
   alias MetaLogger.Slicer.DefaultImpl, as: Subject

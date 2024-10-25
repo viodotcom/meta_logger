@@ -1,4 +1,4 @@
-defmodule MetaLogger.Utf8SlicerTest do
+defmodule MetaLogger.Slicer.Utf8ImplTest do
   use ExUnit.Case, async: true
 
   alias MetaLogger.Slicer.Utf8Impl, as: Subject
