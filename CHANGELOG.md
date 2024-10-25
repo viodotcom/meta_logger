@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.8.0] - 2024-10-25
+
 ### Added
 
 - Add `Tesla.Middleware.MetaLogger` configuration option `:slicer`.
@@ -124,7 +126,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Keep logger metadata from caller processes.
 
-[Unreleased]: https://github.com/FindHotel/meta_logger/compare/1.7.0...HEAD
+[Unreleased]: https://github.com/FindHotel/meta_logger/compare/1.8.0...HEAD
+[1.8.0]: https://github.com/FindHotel/meta_logger/compare/1.7.0...1.8.0
 [1.7.0]: https://github.com/FindHotel/meta_logger/compare/1.6.1...1.7.0
 [1.6.1]: https://github.com/FindHotel/meta_logger/compare/1.6.0...1.6.1
 [1.6.0]: https://github.com/FindHotel/meta_logger/compare/1.5.0...1.6.0
