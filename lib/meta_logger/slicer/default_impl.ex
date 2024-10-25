@@ -4,6 +4,7 @@ defmodule MetaLogger.Slicer.DefaultImpl do
   """
 
   @behaviour MetaLogger.Slicer
+  
   @doc """
   Returns sliced log entries according to the given max entry length.
 
