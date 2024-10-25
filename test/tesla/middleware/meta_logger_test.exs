@@ -212,8 +212,10 @@ defmodule Tesla.Middleware.MetaLoggerTest do
       assert logs =~ ~s([debug] [#{inspect(Subject)}] {"email":"foo@bar.baz","response":"value"})
     end
 
-    test "when the max entry length is given, " <>
-           "logs the request and the response splitting the body" do
+    test """
+    when the max entry length is given, \
+    logs the request and the response splitting the body
+    """ do
       request_body_slice1 = String.duplicate("x", 100)
       request_body_slice2 = String.duplicate("y", 100)
 

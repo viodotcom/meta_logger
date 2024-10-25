@@ -34,9 +34,8 @@ defmodule MetaLogger.Slicer.Utf8Impl do
       when byte_size(entry) <= max_entry_length,
       do: [entry]
 
-  def slice(entry, max_entry_length) do
-    do_slice(entry, max_entry_length, [], [], 0)
-  end
+  def slice(entry, max_entry_length) when is_binary(entry),
+    do: do_slice(entry, max_entry_length, [], [], 0)
 
   @spec do_slice(binary(), integer(), [binary()], [iodata()], integer()) :: [String.t()]
   defp do_slice(<<>>, _max_length, slices, partial_slice, _partial_size) do
@@ -78,12 +77,10 @@ defmodule MetaLogger.Slicer.Utf8Impl do
   # Converts the inverted list of codepoints into a
   # binary slice and appends it to our list of slices.
   @spec bank_partial_slice([binary()], [iodata()]) :: [binary()]
-  defp bank_partial_slice(slices, partial_slice) do
-    [reconstruct_current_slice_as_binary(partial_slice) | slices]
-  end
+  defp bank_partial_slice(slices, partial_slice),
+    do: [reconstruct_current_slice_as_binary(partial_slice) | slices]
 
   @spec reconstruct_current_slice_as_binary([iodata()]) :: binary()
-  defp reconstruct_current_slice_as_binary(current_slice) do
-    IO.iodata_to_binary(Enum.reverse(current_slice))
-  end
+  defp reconstruct_current_slice_as_binary(current_slice),
+    do: IO.iodata_to_binary(Enum.reverse(current_slice))
 end
