@@ -44,7 +44,7 @@ defmodule MetaLogger.Slicer.DefaultImplTest do
     test "when an invalid max entry length is given, returns a list with one entry", %{
       entry: entry
     } do
-      assert Subject.slice(entry, :pqp) == [entry]
+      assert Subject.slice(entry, :foo) == [entry]
     end
 
     test "when slicing a UTF-8 string not all slices will be valid UTF-8 strings" do
