@@ -1,7 +1,7 @@
-defmodule MetaLogger.SlicerTest do
+defmodule MetaLogger.Slicer.DefaultImplTest do
   use ExUnit.Case, async: true
 
-  alias MetaLogger.Slicer, as: Subject
+  alias MetaLogger.Slicer.DefaultImpl, as: Subject
 
   doctest Subject
 
@@ -44,7 +44,17 @@ defmodule MetaLogger.SlicerTest do
     test "when an invalid max entry length is given, returns a list with one entry", %{
       entry: entry
     } do
-      assert Subject.slice(entry, :pqp) == [entry]
+      assert Subject.slice(entry, :foo) == [entry]
+    end
+
+    test "when slicing a UTF-8 string not all slices will be valid UTF-8 strings" do
+      range_of_slices =
+        7..1
+        |> Enum.flat_map(fn max_length ->
+          Subject.slice("Hello 世界", max_length)
+        end)
+
+      refute Enum.all?(range_of_slices, &String.valid?/1)
     end
   end
 end
