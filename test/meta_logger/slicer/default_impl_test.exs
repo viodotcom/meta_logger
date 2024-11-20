@@ -18,8 +18,10 @@ defmodule MetaLogger.Slicer.DefaultImplTest do
       assert Subject.slice(entry, :infinity) == [entry]
     end
 
-    test "when max entry length is smaller than the size of given entry, " <>
-           "returns a list with one entry",
+    test """
+         when max entry length is smaller than the size of given entry, \
+         returns a list with one entry
+         """,
          %{
            entry: entry
          } do
@@ -33,8 +35,10 @@ defmodule MetaLogger.Slicer.DefaultImplTest do
       assert Subject.slice(entry, 5) == ["01234", "56789"]
     end
 
-    test "when given max entry length is three and the given entry size is 10, " <>
-           "returns a list with four entries",
+    test """
+         when given max entry length is three and the given entry size is 10, \
+         returns a list with four entries
+         """,
          %{
            entry: entry
          } do

@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Internal coding style changes.
+
 ## [1.8.0] - 2024-10-25
 
 ### Added
