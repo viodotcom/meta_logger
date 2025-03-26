@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - Internal coding style changes.
+- Bump Tesla to 1.14.1
 
 ## [1.8.0] - 2024-10-25
 
