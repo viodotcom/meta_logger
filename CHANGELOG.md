@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.9.0] - 2025-03-28
+
 ### Changed
 
 - Internal coding style changes.
@@ -130,7 +132,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Keep logger metadata from caller processes.
 
-[Unreleased]: https://github.com/FindHotel/meta_logger/compare/1.8.0...HEAD
+[Unreleased]: https://github.com/FindHotel/meta_logger/compare/1.9.0...HEAD
+[1.9.0]: https://github.com/FindHotel/meta_logger/compare/1.8.0...1.9.0
 [1.8.0]: https://github.com/FindHotel/meta_logger/compare/1.7.0...1.8.0
 [1.7.0]: https://github.com/FindHotel/meta_logger/compare/1.6.1...1.7.0
 [1.6.1]: https://github.com/FindHotel/meta_logger/compare/1.6.0...1.6.1
