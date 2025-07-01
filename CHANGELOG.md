@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+###
+
+- `Tesla.Middleware.MetaLogger` `filter_body` option spec now accepts string as a term to redact.
+
 ## [1.9.0] - 2025-03-28
 
 ### Changed
