@@ -155,7 +155,9 @@ if Code.ensure_loaded?(Tesla) do
 
     defp build_body(body, _options), do: body
 
-    @spec filter_body(Env.body(), {Regex.t(), String.t()} | Regex.t()) :: Env.body()
+    @typep filter_body_entry :: {Regex.t() | String.t(), String.t()} | Regex.t() | String.t()
+
+    @spec filter_body(Env.body(), filter_body_entry()) :: Env.body()
     defp filter_body(body, {pattern, replacement}), do: String.replace(body, pattern, replacement)
     defp filter_body(body, pattern), do: String.replace(body, pattern, @filtered)
 
